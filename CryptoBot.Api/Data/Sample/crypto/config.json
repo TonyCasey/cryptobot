@@ -1,0 +1,31 @@
+﻿{
+  "supports_search": true,
+  "supports_group_request": false, 
+  "supports_marks": true,
+  "supports_timescale_marks": false,
+  "supports_time": true,
+  "exchanges": [
+    {
+      "value": "",
+      "name": "All Exchanges",
+      "desc": ""
+    },
+    {
+      "value": "Cryptocurrency",
+      "name": "Cryptocurrency",
+      "desc": "Cryptocurrency"
+    }
+  ],
+  "symbols_types": [
+    {
+      "name": "All types",
+      "value": ""
+    },
+    {
+      "name": "Cryptocurrency",
+      "value": "Cryptocurrency"
+    }
+  ],
+  "supported_resolutions": [ "5", "15", "30", "60", "D", "2D", "3D", "W", "3W", "M", "6M" ],
+  "intraday_multipliers" : ["1", "5", "15", "30", "60"]
+}

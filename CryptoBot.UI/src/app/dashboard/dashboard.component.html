@@ -1,0 +1,104 @@
+ <div class="container-fluid no-breadcrumbs page-dashboard">
+ 
+  
+
+  <div class="row">
+     <!-- Stats -->
+     <div class="col-xl-3 col-sm-6">
+        <div class="box box-default">
+          <div class="box-top">
+            <i class="material-icons color-warning">euro_symbol</i>
+          </div>
+          <div class="box-info">
+            <span>Net Profit</span>
+          </div>
+          <div class="box-bottom">
+            <span>370.12</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-xl-3 col-sm-6">
+          <div class="box box-default">
+            <div class="box-top">
+                <i class="material-icons color-success">trending_up</i>
+            </div>
+            <div class="box-info">
+              <span>Net Profit %</span>
+            </div>
+            <div class="box-bottom">
+              <span>42 <span class="size-h4">%</span></span>
+            </div>
+          </div>
+        </div>
+
+    <div class="col-xl-3 col-sm-6">
+      <div class="box box-default">
+        <div class="box-top">
+          <i class="material-icons color-success">assessment</i>
+        </div>
+        <div class="box-info">
+          <span>Active Bots</span>
+        </div>
+        <div class="box-bottom">
+          <span>3 <span class="size-h5">(7)</span></span>
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="col-xl-3 col-sm-6">
+      <div class="box box-default">
+        <div class="box-top">
+          <i class="material-icons color-warning">alarm</i>
+        </div>
+        <div class="box-info">
+          <span>Open positions</span>
+        </div>
+        <div class="box-bottom">
+          <span>2</span>
+        </div>
+      </div>
+    </div>
+    <!-- end stats -->      
+  </div>
+
+
+  <article class="article">
+      <h2 class="article-title">Bots</h2>
+      <div class="box box-default table-box table-responsive mdl-shadow--2dp">
+        <table class="mdl-data-table">
+          <thead>
+            <tr>
+              <th class="mdl-data-table__cell--non-numeric">#</th>
+              <th class="mdl-data-table__cell--non-numeric">Name</th>
+              <th class="mdl-data-table__cell--non-numeric">Exchange</th>
+              <th class="mdl-data-table__cell--non-numeric">Pair</th>
+              <th>Amount</th>
+              <th>Net profit</th>
+              <th>Net profit%</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let bot of bots" (click)="viewBot(bot)" style="cursor: pointer" >
+              <td class="mdl-data-table__cell--non-numeric">{{bot.botId}}</td>
+              <td class="mdl-data-table__cell--non-numeric"  [class.color-success]=" bot.active ">{{bot.name}}</td>
+              <td class="mdl-data-table__cell--non-numeric"> <div *ngIf="exchanges !== undefined">{{ getExchange(bot.exchangeId)?.name }}</div> </td>
+              <td class="mdl-data-table__cell--non-numeric color-info">{{bot.baseCoin?.code}}-{{bot.coin?.code}}</td>
+              <td class="color-warning">{{bot.amount}}</td>
+              <td>
+                <div [class.color-danger]="netProfit(bot) < 0 " [class.color-success]=" netProfit(bot) > 0 ">                
+                <i *ngIf="netProfit(bot) > 0" class="material-icons">arrow_upward</i>
+                <i *ngIf="netProfit(bot) < 0" class="material-icons">arrow_downward</i>
+                {{netProfit(bot) }}
+              </div>
+            </td>
+              <td  [class.color-danger]=" getProfitPercent(bot) < 0 " [class.color-success]=" getProfitPercent(bot) > 0 ">{{getProfitPercent(bot)}}%</td>
+            </tr>          
+
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+</div>

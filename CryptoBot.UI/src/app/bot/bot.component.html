@@ -1,0 +1,359 @@
+<div class="container-fluid no-breadcrumbs">
+
+<article class="article">
+    <div class="box box-default">
+        <div class="box-body">
+
+            <div style="height:800px">
+
+                    <tradingview [(symbolPair)]="symbolPair"></tradingview>
+            </div>
+            
+        
+        </div>
+    </div>
+</article>
+
+
+<article class="article">
+        <div class="box box-default">
+          <div class="box-body">
+    
+            <md-tab-group (selectChange)="tabChanged($event)">
+              <md-tab label="Overview">
+                <section class="box box-transparent">
+                  <div class="box-body">                    
+
+                        <div class="row">
+                            <div class="col-xl-3 col-sm-6">                             
+                            </div>
+
+                            <div class="col-xl-9 col-sm-6">
+                              <h4>{{bot.name}}</h4>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                                <!-- Stats -->
+                                <div class="col-xl-3 col-sm-6">
+                                   <div class="box box-default">
+                                     <div class="box-top">
+                                       <i class="material-icons color-warning">euro_symbol</i>
+                                     </div>
+                                     <div class="box-info">
+                                       <span>Net Profit</span>
+                                     </div>
+                                     <div class="box-bottom">
+                                       <span>370.12</span>
+                                     </div>
+                                   </div>
+                                 </div>
+                                 
+                                 <div class="col-xl-3 col-sm-6">
+                                     <div class="box box-default">
+                                       <div class="box-top">
+                                           <i class="material-icons color-success">trending_up</i>
+                                       </div>
+                                       <div class="box-info">
+                                         <span>Net Profit %</span>
+                                       </div>
+                                       <div class="box-bottom">
+                                         <span>42 <span class="size-h4">%</span></span>
+                                       </div>
+                                     </div>
+                                   </div>
+                           
+                               <div class="col-xl-3 col-sm-6">
+                                 <div class="box box-default">
+                                   <div class="box-top">
+                                     <i class="material-icons color-success">assessment</i>
+                                   </div>
+                                   <div class="box-info">
+                                     <span>Trades</span>
+                                   </div>
+                                   <div class="box-bottom">
+                                     <span>35</span>
+                                   </div>
+                                 </div>
+                               </div>
+                               
+                               
+                               <div class="col-xl-3 col-sm-6">
+                                 <div class="box box-default">
+                                   <div class="box-top">
+                                     <i class="material-icons color-warning">alarm</i>
+                                   </div>
+                                   <div class="box-info">
+                                     <span>Open positions</span>
+                                   </div>
+                                   <div class="box-bottom">
+                                     <span>2</span>
+                                   </div>
+                                 </div>
+                               </div>
+                               <!-- end stats -->      
+                             </div>
+
+                             <div class="row">
+                                <div class="col-xl-3 col-sm-6">
+                                  <div class="form-group">
+                                          <div class="full-width">
+                                              <md-slide-toggle checked="true"> Active </md-slide-toggle>
+                                          </div>
+                                  </div>
+                                </div>
+    
+                                <div class="col-xl-9 col-sm-6">
+                                </div>
+    
+                            </div>
+                  </div>
+                </section>
+              </md-tab>
+
+              <md-tab label="Positions log" >
+                    <section class="box box-transparent">
+                      <div class="box-body">
+                        
+                                    <div class="box box-default table-box table-flip-scroll mdl-shadow--2dp">
+                                
+                                      <table class="mdl-data-table table-bordered table-striped cf no-margin">
+                                        <thead class="cf">
+                                          <tr>
+                                            <th>Id</th>
+                                            <th class="numeric">Buy Price</th>
+                                            <th class="numeric">Buy Cost</th>
+                                            <th class="numeric">Sell Price</th>
+                                            <th class="numeric">Sell Total</th>
+                                            <th class="numeric">Quantity</th>                                                                                    
+                                            <th class="numeric">Buy Date</th>
+                                            <th class="numeric">Sell Date</th>
+                                            <th class="numeric">Net Profit</th>
+                                            <th class="numeric">% Profit</th>   
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          <tr *ngFor="let position of positions" [class.color-danger]="position.netProfit < 0 " [class.color-success]=" position.netProfit > 0 ">
+                                            <td>{{position.positionId}}</td>
+                                            <td class="numeric">{{position.buyPrice | number : decimalFormat}}</td>
+                                            <td class="numeric">{{position.buyPrice * position.quantity | number : decimalFormat}}</td>
+                                            <td class="numeric">{{position.sellPrice | number : decimalFormat}}</td>
+                                            <td class="numeric">{{position.sellPrice * position.quantity | number : decimalFormat}}</td>
+                                            <td class="numeric">{{position.quantity}}</td>                                            
+                                            <td class="date">{{position.buyTimeStamp | date: 'dd/MM/yyyy HH-mm-ss' }}</td>
+                                            <td class="date">{{position.sellTimeStamp | date: 'dd/MM/yyyy HH-mm-ss' }}</td>
+                                            <td class="numeric"><h5>{{position.netProfit | number : decimalFormat}}</h5> </td>
+                                            <td class="numeric"><h5>{{position.netProfitPercent | number : decimalFormat}}%</h5></td>
+                                          </tr>
+
+                                          <tr>
+                                              <td colspan="8"></td>
+                                              <td class="numeric" [class.color-danger]="totalProfit < 0 " [class.color-success]=" totalProfit > 0 "><h4>{{totalProfit | number : decimalFormat}}</h4> </td>
+                                              <td class="numeric" [class.color-danger]="totalProfitPercent < 0 " [class.color-success]=" totalProfitPercent > 0 "><h4>{{totalProfitPercent | number : decimalFormat}}%</h4></td>
+                                            </tr>
+                                          
+                                        </tbody>
+                                      </table>
+                                
+                                    </div>
+
+                      </div>
+                    </section>
+                  </md-tab>
+
+              <md-tab label="Settings">
+                <section class="box box-transparent">
+                  <div class="box-body">
+                    
+                        <form>
+
+                                <div class="form-group">
+                                        <div class="full-width">
+                                            <md-slide-toggle checked="true"> Active </md-slide-toggle>
+                                        </div>
+                                        </div>
+        
+                                                      
+                                    <div class="form-group row">
+                                      <div class="col-6">
+                                        <md-input-container class="full-width">
+                                          <input mdInput placeholder="Name">
+                                        </md-input-container>
+                                      </div>
+                                      <div class="col-6">
+                                        <!-- <md-input-container class="full-width">  -->
+                                            <md-select mdInput placeholder="Exchange" [(ngModel)]="selectedExchange" name="Exchange">
+                                                    <md-option *ngFor="let exchange of exchanges" [value]="exchange.value">
+                                                    {{ exchange.viewValue }}
+                                                    </md-option>
+                                                    </md-select>
+                                        <!-- </md-input-container> -->
+                                      </div>
+                                    </div>
+                          
+                                    <div class="form-group row">
+                                        <div class="col-4">
+                                            <md-input-container class="full-width" dividerColor="primary"> 
+                                                <input mdInput placeholder="Amount" value="500"> 
+                                            </md-input-container>
+                                        </div>
+                                        <div class="col-4">
+                                            <md-input-container class="full-width" dividerColor="accent"> 
+                                                <input mdInput placeholder="Candle size" value="60"> 
+                                            </md-input-container>
+                                        </div>
+                                        <div class="col-4">
+                                            <!-- <md-input-container class="full-width" dividerColor="warn"> 
+                                                <input mdInput #postalCode maxlength="5" placeholder="Postal Code" value="94043"> 
+                                                <md-hint align="end">{{postalCode.value.length}} / 5</md-hint> 
+                                            </md-input-container> -->
+                                        </div>
+                                        </div>                            
+                                                      
+                          
+                                  </form>
+                                  
+                  </div>
+                </section>
+              </md-tab>
+              <md-tab label="Indicators">
+                <section class="box box-transparent">
+                  <div class="box-body">
+                    <div class="article-title-style">Indicators</div>
+                  </div>
+                </section>
+              </md-tab>
+              <md-tab label="Back testing">
+                    <section class="box box-transparent">
+                      <div class="box-body">
+                        
+                                    <h4 class="article-title">Trades</h4>
+                                    <div class="box box-default table-box table-flip-scroll mdl-shadow--2dp">
+                                
+                                      <table class="mdl-data-table table-bordered table-striped cf no-margin">
+                                        <thead class="cf">
+                                          <tr>
+                                            <th>Code</th>
+                                            <th class="numeric">Price</th>
+                                            <th class="numeric">Change</th>
+                                            <th class="numeric">Open</th>
+                                            <th class="numeric">High</th>
+                                            <th class="numeric">Low</th>
+                                            <th class="numeric">Volume</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          <tr>
+                                            <td>AAC</td>
+                                            <td class="numeric">$1.38</td>
+                                            <td class="numeric">-0.01</td>
+                                            <td class="numeric">$1.39</td>
+                                            <td class="numeric">$1.39</td>
+                                            <td class="numeric">$1.38</td>
+                                            <td class="numeric">9,395</td>
+                                          </tr>
+                                          <tr>
+                                            <td>AAD</td>
+                                            <td class="numeric">$1.15</td>
+                                            <td class="numeric">  +0.02</td>
+                                            <td class="numeric">$1.14</td>
+                                            <td class="numeric">$1.15</td>
+                                            <td class="numeric">$1.13</td>
+                                            <td class="numeric">56,431</td>
+                                          </tr>
+                                          <tr>
+                                            <td>AAX</td>
+                                            <td class="numeric">$4.00</td>
+                                            <td class="numeric">-0.04</td>
+                                            <td class="numeric">$4.01</td>
+                                            <td class="numeric">$4.05</td>
+                                            <td class="numeric">$4.00</td>
+                                            <td class="numeric">90,641</td>
+                                          </tr>
+                                          <tr>
+                                            <td>ABC</td>
+                                            <td class="numeric">$3.00</td>
+                                            <td class="numeric">  +0.06</td>
+                                            <td class="numeric">$2.98</td>
+                                            <td class="numeric">$3.00</td>
+                                            <td class="numeric">$2.96</td>
+                                            <td class="numeric">862,518</td>
+                                          </tr>
+                                          <tr>
+                                            <td>ABP</td>
+                                            <td class="numeric">$1.91</td>
+                                            <td class="numeric">0.00</td>
+                                            <td class="numeric">$1.92</td>
+                                            <td class="numeric">$1.93</td>
+                                            <td class="numeric">$1.90</td>
+                                            <td class="numeric">595,701</td>
+                                          </tr>
+                                          <tr>
+                                            <td>ABY</td>
+                                            <td class="numeric">$0.77</td>
+                                            <td class="numeric">  +0.02</td>
+                                            <td class="numeric">$0.76</td>
+                                            <td class="numeric">$0.77</td>
+                                            <td class="numeric">$0.76</td>
+                                            <td class="numeric">54,567</td>
+                                          </tr>
+                                          <tr>
+                                            <td>ACR</td>
+                                            <td class="numeric">$3.71</td>
+                                            <td class="numeric">  +0.01</td>
+                                            <td class="numeric">$3.70</td>
+                                            <td class="numeric">$3.72</td>
+                                            <td class="numeric">$3.68</td>
+                                            <td class="numeric">191,373</td>
+                                          </tr>
+                                          <tr>
+                                            <td>ADU</td>
+                                            <td class="numeric">$0.72</td>
+                                            <td class="numeric">0.00</td>
+                                            <td class="numeric">$0.73</td>
+                                            <td class="numeric">$0.74</td>
+                                            <td class="numeric">$0.72</td>
+                                            <td class="numeric">8,602,291</td>
+                                          </tr>
+                                          <tr>
+                                            <td>AGG</td>
+                                            <td class="numeric">$7.81</td>
+                                            <td class="numeric">-0.22</td>
+                                            <td class="numeric">$7.82</td>
+                                            <td class="numeric">$7.82</td>
+                                            <td class="numeric">$7.81</td>
+                                            <td class="numeric">148</td>
+                                          </tr>
+                                          <tr>
+                                            <td>AGK</td>
+                                            <td class="numeric">$13.82</td>
+                                            <td class="numeric">  +0.02</td>
+                                            <td class="numeric">$13.83</td>
+                                            <td class="numeric">$13.83</td>
+                                            <td class="numeric">$13.67</td>
+                                            <td class="numeric">846,403</td>
+                                          </tr>
+                                          <tr>
+                                            <td>AGO</td>
+                                            <td class="numeric">$3.17</td>
+                                            <td class="numeric">-0.02</td>
+                                            <td class="numeric">$3.11</td>
+                                            <td class="numeric">$3.22</td>
+                                            <td class="numeric">$3.10</td>
+                                            <td class="numeric">5,416,303</td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                
+                                    </div>
+
+                      </div>
+                    </section>
+                  </md-tab>
+            </md-tab-group>
+    
+          </div>
+        </div>
+</article>
+
+</div>

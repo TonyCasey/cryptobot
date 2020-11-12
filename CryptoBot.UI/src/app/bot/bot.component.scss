@@ -1,0 +1,57 @@
+// component css goes here
+.box{
+    position: relative;
+    border-radius: 0.2rem;
+}
+
+.box .box-top, .page-dashboard .box .box-bottom {
+    height: 50px;
+    padding: 2px 15px;
+    font-size: 40px;
+    line-height: 1;
+    text-align: center;
+    font-weight: 300;
+}
+
+.box .box-info {
+    position: absolute;
+    width: 100%;
+    top: 35%;
+    margin-top: -12px;
+    text-align: center;
+}
+
+.box .box-bottom {
+    border-top: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.box-bottom {
+    height: 100px;
+    padding: 32px 15px;
+    font-size: 30px;
+    line-height: 1;
+    text-align: center;
+    font-weight: 300;
+}
+
+
+.box .box-info span {
+    background-color: #38424b;
+}
+
+.box .box-info span {
+    height: 24px;
+    display: inline-block;
+    padding: 4px 10px;
+    text-transform: uppercase;
+    line-height: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    font-size: 11px;
+    color: #636c72;
+    border-radius: 1em;
+}
+
+.mat-tab-label {
+    line-height: 28px !important;
+    height: 28px !important;
+}

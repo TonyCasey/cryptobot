@@ -1,0 +1,180 @@
+﻿@inherits Microsoft.VisualStudio.Web.CodeGeneration.Templating.RazorTemplateBase
+using Api.CryptoBot.Data;
+using Api.CryptoBot.Models.DTO;
+using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Net;
+using System.Threading.Tasks;
+using CryptoBot.Model.Domain;
+
+@{
+    string modelName = (Model.ClassName.EndsWith("Controller") ? Model.ClassName.Substring(0, Model.ClassName.Length - 10) : Model.ClassName);
+    string entityName = modelName;
+    if (entityName.EndsWith("s"))
+    {
+        entityName = entityName.Remove(entityName.Length - 1, 1);
+    }
+    string requestDto = entityName + "RequestDto";
+    string responseDto = entityName + "ResponseDto";
+    string searchRequestDto = entityName + "SearchRequestDto";
+    string searchResponseDto = entityName + "SearchResponseDto";
+    string primaryKeyField = entityName.ToLower() + "Id";
+}
+namespace @Model.NamespaceName
+{
+@{
+    string routePrefix = "api/" + modelName;
+}
+    /// <summary>
+    /// @modelName controller
+    ///
+    ///</summary>
+    //[Microsoft.AspNetCore.Authorization.Authorize]
+    [Produces("application/json")]
+    [ApiVersion("1.0")]
+    [Microsoft.AspNetCore.Mvc.Route("api/v{version:apiVersion}/[controller]")]
+    public class @Model.ClassName : BaseController< @requestDto, @responseDto, @searchRequestDto, @searchResponseDto >
+    {
+
+        private readonly IMapper _mapper;
+        private readonly CryptoBotApiDbContext _dbContext;
+
+        /// <summary>
+        /// Main constructor to inject mapper and IService
+        ///
+        /// </summary>
+        /// <param name="mapper"></param>
+        /// <param name="service"></param>
+        public @Model.ClassName (IMapper mapper,  CryptoBotApiDbContext dbContext )
+        :base(mapper)
+        {
+            _mapper = mapper;
+            _dbContext = dbContext;
+        }
+
+        // GET: api/@modelName/5
+        /// <summary>
+        /// returns a specific @modelName with the specified id
+        ///
+        ///
+        /// </summary>
+        /// <param name="Id">id of @modelName to return</param>
+        /// <returns>a single @modelName</returns>
+        /// <response code="200">@modelName found - body contains data</response>
+        /// <response code="404">@modelName does not exist</response>
+        [Microsoft.AspNetCore.Mvc.HttpGet("{@primaryKeyField}")]
+        public override async Task< @responseDto > Get(long @primaryKeyField)
+        {
+            return null;
+        }
+
+        // POST: api/@modelName
+        /// <summary>
+        /// adds a @modelName type to the system
+        ///
+        ///
+        /// </summary>
+        /// <param name="value">new @modelName DTO to add</param>
+        /// <response code="201">@modelName created</response>
+        /// <response code="400">Request is not valid</response>
+        [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(Uri))]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(void))]
+        [Microsoft.AspNetCore.Mvc.HttpPost]
+        public override async Task<CreatedResult> Post([Microsoft.AspNetCore.Mvc.FromBody]@requestDto requestDto)
+        {
+
+            var id =1; // create record
+
+            return Created($"/api/@modelName/{id}", id );
+
+        }
+
+        // PUT: api/@modelName/5
+        /// <summary>
+        /// modifies the existing @modelName
+        ///
+        ///
+        /// </summary>
+        /// <param name="Id">id of @modelName</param>
+        /// <param name="value">DTO of @modelName to change</param>
+        /// <returns></returns>
+        /// <response code="204">resource modified</response>
+        /// <response code="403">not allowed to modify the resource</response>
+        /// <response code="404">resource does not exist</response>
+        [ProducesResponseType((int)HttpStatusCode.Forbidden, Type = typeof(string))]
+        [ProducesResponseType((int)HttpStatusCode.NoContent, Type = typeof(string))]
+        [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(string))]
+        [Microsoft.AspNetCore.Mvc.HttpPut("{@primaryKeyField}")]
+        public override async Task< @responseDto > Put(long @primaryKeyField, [Microsoft.AspNetCore.Mvc.FromBody]@requestDto requestDto)
+        {
+            return null;
+
+        }
+
+        // DELETE: api/@modelName/5
+        /// <summary>
+        /// removes a @modelName from the system
+        ///
+        ///
+        /// </summary>
+        /// <param name="Id">id of @modelName to remove</param>
+        /// <response code="204">@modelName removed</response>
+        /// <response code="403">not allowed to remove @modelName</response>
+        /// <response code="404">@modelName does not exist</response>
+        [ProducesResponseType((int)HttpStatusCode.Forbidden, Type = typeof(string))]
+        [ProducesResponseType((int)HttpStatusCode.NoContent, Type = typeof(void))]
+        [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(string))]
+        [HttpDelete]
+        public async Task<bool> Delete(int @primaryKeyField)
+        {
+            return true;
+        }
+
+        [Microsoft.AspNetCore.Mvc.HttpGet]
+        [Microsoft.AspNetCore.Mvc.Route("Search")]
+        public override async Task< @searchResponseDto > Search(@searchRequestDto searchRequest)
+        {
+            // YOU MUST:implement logic to return total count result and replace -1 below
+            return null;
+        }
+
+
+
+    }
+
+            // ALL CLASSES BELOW ARE AUTO-GENERATED SAMPLE CLASSES
+            // YOU SHOULD CREATE SEPARATE FILES FOR EACH & MOVE INTO YOUR /Models/DTO/@modelName/ FOLDER AND EXTEND
+
+
+            /// <summary>
+            /// You might already have an entity in your model for this entity in your domain/BusinessEntities folder
+            /// if so, just remove this class
+            /// </summary>
+            public class @modelName : BaseEntity // must extend BaseEntity
+            {
+                public long @primaryKeyField { get; set; }
+            }
+
+            public class @responseDto : ResponseBaseDto // must extend ResponseBaseDto
+            {
+                public long @primaryKeyField { get; set; }
+                public string Description { get; set; }
+            }
+
+            public class @requestDto : RequestBaseDto // must extend RequestBaseDto
+            {
+                public long @primaryKeyField { get; set; }
+                public string Description { get; set; }
+            }
+
+            public class @searchRequestDto : SearchBase // must extend SearchBase
+            {
+                public long @primaryKeyField { get; set; }
+            }
+
+            public class @searchResponseDto : SearchResponseBase< @responseDto > // must extend SearchResponseBase
+            {
+                public string Description { get; set; }
+            }
+}
