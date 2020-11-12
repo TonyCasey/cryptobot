@@ -1394,7 +1394,7 @@ namespace CryptoBot.Database
                     new MessagingAppSettings
                     {
                         Key = Constants.Token,
-                        Value = "529235243:AAFAM2GuX--kprVm13W4xZxgjD-V8Z-7tHo"
+                        Value = "o"
                     }
                 }
             });

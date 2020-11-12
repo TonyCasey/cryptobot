@@ -20,9 +20,9 @@ namespace CryptoBot.Tests
             {
                 Url = "api.gdax.com",
                 SocketUrl = "wss://ws-feed.gdax.com",
-                PassPhrase = "6i89kxgbwfd",
-                ApiKey = "7defb75d4e46be15806188541dc0f425", // read only
-                Secret = "Q7asiE0WkMzZeo3Z+QZ0kidQ+rj90cueBMdGsooZ81jgkoEQo43HuWeLnKVUFpkYGx6bQkxFPIPsAG3jcNRj1g==",
+                PassPhrase = "",
+                ApiKey = "", // read only
+                Secret = "",
                 CommissionRate = .25,
                 Simulate = true
             };
