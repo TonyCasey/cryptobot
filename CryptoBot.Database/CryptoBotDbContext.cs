@@ -53,7 +53,7 @@ namespace CryptoBot.Database
                 Logger = LogManager.GetCurrentClassLogger();
                 Logger.Error(e.Message);
                 Logger.Error(e.InnerException);
-                throw e;
+                throw;
             }
         }
 

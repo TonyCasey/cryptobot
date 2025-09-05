@@ -3,7 +3,6 @@ using CryptoBot.Model.Exchanges;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NLog;
-using System.Net;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -388,9 +387,9 @@ namespace CryptoBot.ExchangeEngine.API.Exchanges
                 // re-sort in ascending order
                 candles.Sort((c1, c2) => c1.Timestamp.CompareTo(c2.Timestamp));
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                throw e;
+                throw;
             }
 
             

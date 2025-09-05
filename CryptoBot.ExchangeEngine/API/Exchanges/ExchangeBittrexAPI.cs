@@ -2,7 +2,6 @@
 
 using CryptoBot.Model.Exchanges;
 using Newtonsoft.Json.Linq;
-using System.Net;
 using System;
 using System.Collections.Generic;
 using System.Net;

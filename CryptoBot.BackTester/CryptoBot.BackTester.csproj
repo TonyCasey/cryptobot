@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -30,6 +30,10 @@
     <ProjectReference Include="..\CryptoBot.Core\CryptoBot.Core.csproj" />
     <ProjectReference Include="..\CryptoBot.ExchangeEngine\CryptoBot.ExchangeEngine.csproj" />
     <ProjectReference Include="..\CryptoBot.Model\CryptoBot.Model.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="CryptoBot.BackTester.csproj.backup" />
   </ItemGroup>
 
 </Project>
