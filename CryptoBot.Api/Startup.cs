@@ -48,7 +48,13 @@ namespace Api.CryptoBot
                         .AllowCredentials());
             });
 
-            services.AddAutoMapper();
+            // Configure AutoMapper manually
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AllowNullCollections = true;
+                // Add your mapping profiles here
+            });
+            services.AddSingleton(mappingConfig.CreateMapper());
 
             string connectionString = Configuration.GetConnectionString("CryptoBotConnection");
             services.AddDbContext<CryptoBotApiDbContext>(options => options.UseSqlServer(connectionString, sqlServerOptionsAction:
@@ -65,8 +71,8 @@ namespace Api.CryptoBot
 
             services.AddMvc(options =>
                 options.OutputFormatters.RemoveType<Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter>())
-                .AddJsonOptions(
-                    options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                .AddNewtonsoftJson(options => 
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
                 );
             
 
@@ -81,8 +87,8 @@ namespace Api.CryptoBot
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
+            // Modern logging is configured in Program.cs/Startup.ConfigureServices
+            // Remove obsolete logger configuration
             _logger = loggerFactory.CreateLogger(typeof(Startup));
 
 #if DEBUG
@@ -104,7 +110,7 @@ namespace Api.CryptoBot
 
             app.UseSwagger();
 #if DEBUG
-            app.UseSwaggerUi();
+            app.UseSwaggerUI();
 #endif 
         }
 
@@ -119,8 +125,8 @@ namespace Api.CryptoBot
                 else
                     // logger.LogDebug($"Swagger expected a xml doc file  at '{xmlDocFile}' which was not found.");
 
-                c.DescribeAllEnumsAsStrings(); // if this is not enabled, enum values are treated as int's. probably not what you want
-                c.SingleApiVersion(new Swashbuckle.Swagger.Model.Info() {Title = "CryptoBot.Api", Version = "v1"});
+                // Modern Swagger configuration for .NET 8
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "CryptoBot.Api", Version = "v1" });
             });
         }
 

@@ -123,7 +123,7 @@ namespace Api.CryptoBot.Data
             // Needed for Migrations
             if (!optionsBuilder.IsConfigured)
             {
-                string connectionString = ConfigurationManager.ConnectionStrings["CryptoBotConnection"].ConnectionString;
+                string connectionString = "Data Source=.;Initial Catalog=CryptoBot_Dev;Integrated Security=true;Trust Server Certificate=true";
                 
                 optionsBuilder.UseSqlServer(connectionString);
             }
