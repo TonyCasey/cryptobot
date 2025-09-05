@@ -26,7 +26,7 @@ namespace CryptoBot.IndicatrorEngine.Macd
         {
             
 
-            var closingFloats = candles.Select(x => (float) x.ClosePrice).ToArray();
+            var closingPrices = candles.Select(x => (double) x.ClosePrice).ToArray();
 
             /**
              *  The initial values given by the MACD here always seem to be off.
@@ -34,15 +34,17 @@ namespace CryptoBot.IndicatrorEngine.Macd
              *  They are very accurate once they do.
              */
 
-            int startIndex = 0, endIndex = closingFloats.Length - 1;
-            int outBegIndex = 0, outNbElement = 0;
-            double[] outMacd = new double[endIndex];
-            double[] outMacdSignal = new double[endIndex];
-            double[] outMacdHistogram = new double[endIndex];
+            double[] outMacd = new double[closingPrices.Length];
+            double[] outMacdSignal = new double[closingPrices.Length];
+            double[] outMacdHistogram = new double[closingPrices.Length];
             int fastLength = 12, slowLength = 26, signalSmoothing = 9;
 
-            var response = Core.Macd(startIndex, endIndex, closingFloats, fastLength, slowLength,
-                signalSmoothing, out outBegIndex, out outNbElement, outMacd, outMacdSignal, outMacdHistogram);            
+            var response = Functions.Macd(closingPrices.AsSpan(), new Range(0, closingPrices.Length), 
+                outMacd.AsSpan(), outMacdSignal.AsSpan(), outMacdHistogram.AsSpan(), out var outRange, 
+                fastLength, slowLength, signalSmoothing);
+                
+            int outBegIndex = outRange.Start.Value;
+            int outNbElement = outRange.End.Value - outRange.Start.Value;            
 
             List<Model.Macd> macds = new List<Model.Macd>();
 

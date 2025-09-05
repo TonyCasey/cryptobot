@@ -3,7 +3,7 @@ using CryptoBot.Model.Exchanges;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NLog;
-using RestSharp.Extensions.MonoHttp;
+using System.Net;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -244,10 +244,10 @@ namespace CryptoBot.ExchangeEngine.API.Exchanges
                 if (sinceDateTime != null)
                 {
                     url += "&start=" +
-                           HttpUtility.UrlEncode(sinceDateTime.Value.ToString("s",
+                           WebUtility.UrlEncode(sinceDateTime.Value.ToString("s",
                                System.Globalization.CultureInfo.InvariantCulture));
                     url += "&end=" +
-                           HttpUtility.UrlEncode(sinceDateTime.Value.AddMinutes(5.0)
+                           WebUtility.UrlEncode(sinceDateTime.Value.AddMinutes(5.0)
                                .ToString("s", System.Globalization.CultureInfo.InvariantCulture));
                 }
                 tradeChunk = MakeJsonRequest<decimal[][]>(url);
@@ -355,10 +355,10 @@ namespace CryptoBot.ExchangeEngine.API.Exchanges
             sb.Append(symbol);
             sb.Append("/candles?granularity=" + periodSeconds);
             sb.Append("&start=" +
-                      HttpUtility.UrlEncode(startDate.Value.ToString("s",
+                      WebUtility.UrlEncode(startDate.Value.ToString("s",
                           System.Globalization.CultureInfo.InvariantCulture)).ToUpper());
             sb.Append("&end=" +
-                      HttpUtility.UrlEncode(endDate.Value.ToString("s",
+                      WebUtility.UrlEncode(endDate.Value.ToString("s",
                           System.Globalization.CultureInfo.InvariantCulture)).ToUpper());
 
             // nightmare here with GDAX, they ignore the date in the url and return 350+ records

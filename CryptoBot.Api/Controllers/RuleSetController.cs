@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Api.CryptoBot.Models.DTO.RuleSet;
 using Api.CryptoBot.Models.Extensions;
 using CryptoBot.Model.Domain;
+using Asp.Versioning;
 
 namespace Api.CryptoBot.Controllers
 {

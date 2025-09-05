@@ -9,6 +9,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Api.CryptoBot.Models.DTO.Chart;
 using CryptoBot.Model.Domain;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Server.Kestrel.Internal.System.Text.Encodings.Web.Utf8;
 using Newtonsoft.Json;
 using System.IO;

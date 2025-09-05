@@ -24,21 +24,21 @@ namespace CryptoBot.IndicatrorEngine.Stocastic
 
         public Enumerations.IndicatorSignalEnum GetIndicatorPosition(List<Candle> candles, List<RuleSet> ruleSets)
         {
-            var inHigh = candles.Select(x => (float) x.HighPrice).ToArray();
-            var inLow = candles.Select(x => (float) x.LowPrice).ToArray();
-            var inClose = candles.Select(x => (float) x.ClosePrice).ToArray();
+            var inHigh = candles.Select(x => (double) x.HighPrice).ToArray();
+            var inLow = candles.Select(x => (double) x.LowPrice).ToArray();
+            var inClose = candles.Select(x => (double) x.ClosePrice).ToArray();
 
-            int startIndex = 0, endIndex = inHigh.Length - 1;
-            int outBegIndex = 0, outNbElement = 0;
             int optInFastKPeriod = 14, optInSlowKPeriod = 1, optInSlowDPeriod = 3;
             
+            double[] outSlowK = new double[inHigh.Length]; 
+            double[] outSlowD = new double[inHigh.Length];
 
-            double[] outSlowK = new double[endIndex]; 
-            double[] outSlowD = new double[endIndex];
-
-            var response = Core.Stoch(startIndex, endIndex, inHigh, inLow, inClose,
-                optInFastKPeriod, optInSlowKPeriod, Core.MAType.Sma, optInSlowDPeriod, Core.MAType.Sma, out outBegIndex,
-                out outNbElement, outSlowK, outSlowD);
+            var response = Functions.Stoch(inHigh.AsSpan(), inLow.AsSpan(), inClose.AsSpan(), new Range(0, inHigh.Length),
+                outSlowK.AsSpan(), outSlowD.AsSpan(), out var outRange,
+                optInFastKPeriod, optInSlowKPeriod, Core.MAType.Sma, optInSlowDPeriod, Core.MAType.Sma);
+                
+            int outBegIndex = outRange.Start.Value;
+            int outNbElement = outRange.End.Value - outRange.Start.Value;
 
             if (response != Core.RetCode.Success || (!outSlowK.Any() || outSlowK[0] <= 0) ) 
             {

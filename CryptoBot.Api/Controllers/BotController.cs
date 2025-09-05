@@ -9,6 +9,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Api.CryptoBot.Models.DTO.Bot;
 using CryptoBot.Model.Domain;
+using Asp.Versioning;
 
 namespace Api.CryptoBot.Controllers
 {

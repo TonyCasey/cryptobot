@@ -12,7 +12,7 @@
     <PackageReference Include="NLog" Version="5.2.8" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <!-- TA-Lib needs special handling for .NET Core/8 -->
-    <PackageReference Include="TALib.NETCore" Version="0.4.5" />
+    <PackageReference Include="TALib.NETCore" Version="0.5.0" />
   </ItemGroup>
 
   <ItemGroup>
