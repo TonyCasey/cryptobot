@@ -9,7 +9,7 @@ using CryptoBot.Model.Domain.Bot;
 using CryptoBot.Model.Domain.Market;
 using Newtonsoft.Json;
 using NLog;
-using TicTacTec.TA.Library;
+using TALib;
 
 namespace CryptoBot.IndicatrorEngine.Macd
 {
@@ -41,7 +41,7 @@ namespace CryptoBot.IndicatrorEngine.Macd
             double[] outMacdHistogram = new double[endIndex];
             int fastLength = 12, slowLength = 26, signalSmoothing = 9;
 
-            var response = TicTacTec.TA.Library.Core.Macd(startIndex, endIndex, closingFloats, fastLength, slowLength,
+            var response = Core.Macd(startIndex, endIndex, closingFloats, fastLength, slowLength,
                 signalSmoothing, out outBegIndex, out outNbElement, outMacd, outMacdSignal, outMacdHistogram);            
 
             List<Model.Macd> macds = new List<Model.Macd>();

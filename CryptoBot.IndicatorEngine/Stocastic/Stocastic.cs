@@ -9,7 +9,7 @@ using CryptoBot.Model.Domain.Bot;
 using CryptoBot.Model.Domain.Market;
 using Newtonsoft.Json;
 using NLog;
-using TicTacTec.TA.Library;
+using TALib;
 
 namespace CryptoBot.IndicatrorEngine.Stocastic
 {
@@ -36,7 +36,7 @@ namespace CryptoBot.IndicatrorEngine.Stocastic
             double[] outSlowK = new double[endIndex]; 
             double[] outSlowD = new double[endIndex];
 
-            var response = TicTacTec.TA.Library.Core.Stoch(startIndex, endIndex, inHigh, inLow, inClose,
+            var response = Core.Stoch(startIndex, endIndex, inHigh, inLow, inClose,
                 optInFastKPeriod, optInSlowKPeriod, Core.MAType.Sma, optInSlowDPeriod, Core.MAType.Sma, out outBegIndex,
                 out outNbElement, outSlowK, outSlowD);
 
