@@ -49,7 +49,7 @@ namespace CryptoBot.BackTester
         }
 
         [TestMethod]
-        public async Task BackTestAllBots()
+        public Task BackTestAllBots()
         {
             // get user 
             User user = _dbContext
@@ -116,7 +116,7 @@ namespace CryptoBot.BackTester
                  * 
                  */
 
-                int requiredWeeks = 1;
+                // int requiredWeeks = 1; // TODO: Use this for multi-week backtesting
 
                 List<Candle> candles = new List<Candle>();
 
@@ -188,6 +188,7 @@ namespace CryptoBot.BackTester
 
             }
 
+            return Task.CompletedTask;
         }
     }
 

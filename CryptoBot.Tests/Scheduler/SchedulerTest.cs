@@ -13,7 +13,7 @@ namespace CryptoBot.Tests.Scheduler
     [TestClass]
     public class SchedulerTest:BaseTest
     {
-        private Logger _logger;
+        private new Logger _logger;
         private Dictionary<Coin, Coin> _coins;
         private Core.Scheduling.Scheduler _scheduler;
 

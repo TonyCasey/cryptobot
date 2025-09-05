@@ -20,8 +20,8 @@ namespace CryptoBot.Tests.Orders
     [TestClass]
     public class ExchangeIntegrationTest : BaseTest
     {
-        private Logger _logger;
-        private CryptoBotDbContext _dbContext;        
+        private new Logger _logger;
+        private new CryptoBotDbContext _dbContext;        
         private User _user;
         private IExchangeApi _exchangeApi;
         private static IMessagingApp _messagingApp;
