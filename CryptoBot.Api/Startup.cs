@@ -23,7 +23,7 @@ namespace Api.CryptoBot
 
         public IContainer ApplicationContainer { get; private set; }
 
-        public Startup(Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
+        public Startup(Microsoft.AspNetCore.Hosting.IWebHostEnvironment env)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
@@ -85,7 +85,7 @@ namespace Api.CryptoBot
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             // Modern logging is configured in Program.cs/Startup.ConfigureServices
             // Remove obsolete logger configuration
@@ -94,7 +94,11 @@ namespace Api.CryptoBot
 #if DEBUG
             app.UseDeveloperExceptionPage();
 #endif 
-            app.UseMvcWithDefaultRoute();
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
 
             app.UseCors("CorsPolicy");
 

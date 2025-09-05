@@ -57,14 +57,14 @@ namespace Api.CryptoBot.Controllers
 
 
         [Microsoft.AspNetCore.Mvc.HttpGet("config")]
-        public async Task<ConfigResponseDto> Config()
+        public Task<ConfigResponseDto> Config()
         {
             var json = System.IO.File.ReadAllText("D:\\Development\\CryptoBot\\CryptoBot.Api\\Data\\Sample\\crypto\\config.json");
-            return JsonConvert.DeserializeObject<ConfigResponseDto>(json);
+            return Task.FromResult(JsonConvert.DeserializeObject<ConfigResponseDto>(json));
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet("symbols")]
-        public async Task<SymbolsResponseDto> Symbols(string symbol)
+        public Task<SymbolsResponseDto> Symbols(string symbol)
         {
             if (symbol.Contains(":"))
                 symbol = symbol.Split(':')[1];
@@ -72,13 +72,13 @@ namespace Api.CryptoBot.Controllers
             var json = System.IO.File.ReadAllText("D:\\Development\\CryptoBot\\CryptoBot.Api\\Data\\Sample\\crypto\\symbols.json");
             var searchResults = JsonConvert.DeserializeObject<IEnumerable<Symbol>>(json);
 
-            return _mapper.Map(searchResults.FirstOrDefault(x => x.Name == symbol), new SymbolsResponseDto());
+            return Task.FromResult(_mapper.Map(searchResults.FirstOrDefault(x => x.Name == symbol), new SymbolsResponseDto()));
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet("symbol_info")]
-        public async Task<SymbolInfoResponseDto> SymbolInfo(string group)
+        public Task<SymbolInfoResponseDto> SymbolInfo(string group)
         {
-            return new SymbolInfoResponseDto()
+            return Task.FromResult(new SymbolInfoResponseDto()
             {
                 Symbol = new string[]{"AAPL", "MSFT", "SPX"},
                 Description = new string[]{"Apple Inc", "Microsoft corp", "S&P 500 index"},
@@ -93,11 +93,11 @@ namespace Api.CryptoBot.Controllers
                 Ticker = new string[]{"AAPL~0", "MSFT~0", "$SPX500"},
                 Timezone = "America / New_York",
                 Sessionregular = "0900 - 1600"
-            };
+            });
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet("search")]
-        public async Task<List<SymbolSearchResponseDto>> Search(string query, int limit, string exchange, string type)
+        public Task<List<SymbolSearchResponseDto>> Search(string query, int limit, string exchange, string type)
         {
             // Need to convert this into SymbolInfo objects
             var json = System.IO.File.ReadAllText("D:\\Development\\CryptoBot\\CryptoBot.Api\\Data\\Sample\\crypto\\symbols.json");
@@ -108,12 +108,12 @@ namespace Api.CryptoBot.Controllers
 
             List<SymbolSearchResponseDto> results = _mapper.Map(searchResults, new List<SymbolSearchResponseDto>());
 
-            return results;
+            return Task.FromResult(results);
 
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet("history")]
-        public async Task<HistoryResponseDto> History(string symbol, Int32 from, Int32 to, string resolution)
+        public Task<HistoryResponseDto> History(string symbol, Int32 from, Int32 to, string resolution)
         {
             _exchangeApi = ExchangeFactory.GetExchangeApi(Enumerations.ExchangesEnum.Gdax, null);
 
@@ -135,7 +135,7 @@ namespace Api.CryptoBot.Controllers
                 Status = "ok"
             };
 
-            return response;
+            return Task.FromResult(response);
 
             //var json = System.IO.File.ReadAllText("D:\\Development\\CryptoBot\\CryptoBot.Api\\Data\\Sample\\history.json");
             //var result = JsonConvert.DeserializeObject<HistoryResponseDto>(json);
@@ -149,18 +149,18 @@ namespace Api.CryptoBot.Controllers
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet("marks")]
-        public async Task<MarksResponseDto> Marks(string symbol, Int32 from, Int32 to, string resolution)
+        public Task<MarksResponseDto> Marks(string symbol, Int32 from, Int32 to, string resolution)
         {
             //var json = System.IO.File.ReadAllText("D:\\Development\\CryptoBot\\CryptoBot.Api\\Data\\Sample\\marks.json");
             //return JsonConvert.DeserializeObject<MarksResponseDto>(json);
             // Not in use at the moment
-            return new MarksResponseDto();
+            return Task.FromResult(new MarksResponseDto());
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet("time")]
-        public async Task<Int32> Time()
+        public Task<Int32> Time()
         {
-            return (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            return Task.FromResult((Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds);
         }
         
 

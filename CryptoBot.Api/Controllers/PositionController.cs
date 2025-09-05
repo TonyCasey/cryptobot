@@ -25,7 +25,7 @@ namespace Api.CryptoBot.Controllers
     public class PositionController : BaseController< PositionRequestDto, PositionResponseDto, PositionSearchRequestDto, PositionSearchResponseDto >
     {
 
-        private readonly IMapper _mapper;
+        private new readonly IMapper _mapper;
         private readonly CryptoBotApiDbContext _dbContext;
 
         /// <summary>
@@ -52,11 +52,11 @@ namespace Api.CryptoBot.Controllers
         /// <response code="200">Position found - body contains data</response>
         /// <response code="404">Position does not exist</response>
         [Microsoft.AspNetCore.Mvc.HttpGet("{positionId}")]
-        public override async Task<PositionResponseDto> Get(long positionId)
+        public override Task<PositionResponseDto> Get(long positionId)
         {
             var record = _dbContext.Positions.FirstOrDefault(x => x.PositionId == positionId);
 
-            return record == null ? new PositionResponseDto() : _mapper.Map(record, new PositionResponseDto());
+            return Task.FromResult(record == null ? new PositionResponseDto() : _mapper.Map(record, new PositionResponseDto()));
             
         }
 
@@ -72,12 +72,12 @@ namespace Api.CryptoBot.Controllers
         [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(Uri))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(void))]
         [Microsoft.AspNetCore.Mvc.HttpPost]
-        public override async Task<CreatedResult> Post([Microsoft.AspNetCore.Mvc.FromBody]PositionRequestDto requestDto)
+        public override Task<CreatedResult> Post([Microsoft.AspNetCore.Mvc.FromBody]PositionRequestDto requestDto)
         {
 
             var id =1; // create record
 
-            return Created($"/api/Position/{id}", id );
+            return Task.FromResult(Created($"/api/Position/{id}", id ));
 
         }
 
@@ -97,9 +97,9 @@ namespace Api.CryptoBot.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent, Type = typeof(string))]
         [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(string))]
         [Microsoft.AspNetCore.Mvc.HttpPut("{positionId}")]
-        public override async Task< PositionResponseDto > Put(long positionId, [Microsoft.AspNetCore.Mvc.FromBody]PositionRequestDto requestDto)
+        public override Task< PositionResponseDto > Put(long positionId, [Microsoft.AspNetCore.Mvc.FromBody]PositionRequestDto requestDto)
         {
-            return null;
+            return Task.FromResult<PositionResponseDto>(null);
 
         }
 
@@ -117,14 +117,14 @@ namespace Api.CryptoBot.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent, Type = typeof(void))]
         [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(string))]
         [HttpDelete]
-        public async Task<bool> Delete(int positionId)
+        public Task<bool> Delete(int positionId)
         {
-            return true;
+            return Task.FromResult(true);
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet]
         [Microsoft.AspNetCore.Mvc.Route("Search")]
-        public override async Task<PositionSearchResponseDto> Search(PositionSearchRequestDto searchRequest)
+        public override Task<PositionSearchResponseDto> Search(PositionSearchRequestDto searchRequest)
         {
             
             PositionSearchResponseDto result = new PositionSearchResponseDto
@@ -138,7 +138,7 @@ namespace Api.CryptoBot.Controllers
                 )
             };
 
-            return result;
+            return Task.FromResult(result);
         }
 
 

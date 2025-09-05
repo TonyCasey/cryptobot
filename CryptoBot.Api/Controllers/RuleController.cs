@@ -25,7 +25,7 @@ namespace Api.CryptoBot.Controllers
     public class RuleController : BaseController< RuleRequestDto, RuleResponseDto, RuleSearchRequestDto, RuleSearchResponseDto >
     {
 
-        private readonly IMapper _mapper;
+        private new readonly IMapper _mapper;
         private readonly CryptoBotApiDbContext _dbContext;
 
         /// <summary>
@@ -52,9 +52,9 @@ namespace Api.CryptoBot.Controllers
         /// <response code="200">Rule found - body contains data</response>
         /// <response code="404">Rule does not exist</response>
         [Microsoft.AspNetCore.Mvc.HttpGet("{ruleId}")]
-        public override async Task< RuleResponseDto > Get(long ruleId)
+        public override Task< RuleResponseDto > Get(long ruleId)
         {
-            return _mapper.Map(_dbContext.Rules.FirstOrDefault(x=>x.RuleId == ruleId), new RuleResponseDto());
+            return Task.FromResult(_mapper.Map(_dbContext.Rules.FirstOrDefault(x=>x.RuleId == ruleId), new RuleResponseDto()));
         }
 
         // POST: api/Rule
@@ -69,12 +69,12 @@ namespace Api.CryptoBot.Controllers
         [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(Uri))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(void))]
         [Microsoft.AspNetCore.Mvc.HttpPost]
-        public override async Task<CreatedResult> Post([Microsoft.AspNetCore.Mvc.FromBody]RuleRequestDto requestDto)
+        public override Task<CreatedResult> Post([Microsoft.AspNetCore.Mvc.FromBody]RuleRequestDto requestDto)
         {
 
             var id =1; // create record
 
-            return Created($"/api/Rule/{id}", id );
+            return Task.FromResult(Created($"/api/Rule/{id}", id ));
 
         }
 
@@ -94,9 +94,9 @@ namespace Api.CryptoBot.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent, Type = typeof(string))]
         [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(string))]
         [Microsoft.AspNetCore.Mvc.HttpPut("{ruleId}")]
-        public override async Task< RuleResponseDto > Put(long ruleId, [Microsoft.AspNetCore.Mvc.FromBody]RuleRequestDto requestDto)
+        public override Task< RuleResponseDto > Put(long ruleId, [Microsoft.AspNetCore.Mvc.FromBody]RuleRequestDto requestDto)
         {
-            return null;
+            return Task.FromResult<RuleResponseDto>(null);
 
         }
 
@@ -114,21 +114,21 @@ namespace Api.CryptoBot.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent, Type = typeof(void))]
         [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(string))]
         [HttpDelete]
-        public async Task<bool> Delete(int ruleId)
+        public Task<bool> Delete(int ruleId)
         {
-            return true;
+            return Task.FromResult(true);
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet]
         [Microsoft.AspNetCore.Mvc.Route("Search")]
-        public override async Task<RuleSearchResponseDto> Search(RuleSearchRequestDto searchRequest)
+        public override Task<RuleSearchResponseDto> Search(RuleSearchRequestDto searchRequest)
         {
             RuleSearchResponseDto result = new RuleSearchResponseDto
             {
                 Data = _mapper.Map(_dbContext.Rules.FilterByIndicatorRuleTypeId(searchRequest.IndicatorRuleTypeId), new List<RuleResponseDto>())
             };
 
-            return result;
+            return Task.FromResult(result);
         }
 
 

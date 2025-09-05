@@ -23,7 +23,7 @@ namespace Api.CryptoBot.Controllers
     public class BotController : BaseController< BotRequestDto, BotResponseDto, BotSearchRequestDto, BotSearchResponseDto >
     {
 
-        private readonly IMapper _mapper;
+        private new readonly IMapper _mapper;
         private readonly CryptoBotApiDbContext _dbContext;
 
         /// <summary>
@@ -52,10 +52,10 @@ namespace Api.CryptoBot.Controllers
         /// <response code="200">Bot found - body contains data</response>
         /// <response code="404">Bot does not exist</response>
         [Microsoft.AspNetCore.Mvc.HttpGet("{botId}")]
-        public override async Task<BotResponseDto> Get(long botId)
+        public override Task<BotResponseDto> Get(long botId)
         {
             var result = _dbContext.Bots.FirstOrDefault(x => x.BotId == botId);
-            return _mapper.Map(result, new BotResponseDto());
+            return Task.FromResult(_mapper.Map(result, new BotResponseDto()));
         }
 
         
@@ -71,12 +71,12 @@ namespace Api.CryptoBot.Controllers
         [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(Uri))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(void))]
         [Microsoft.AspNetCore.Mvc.HttpPost]
-        public override async Task<CreatedResult> Post([Microsoft.AspNetCore.Mvc.FromBody]BotRequestDto requestDto)
+        public override Task<CreatedResult> Post([Microsoft.AspNetCore.Mvc.FromBody]BotRequestDto requestDto)
         {
 
             var id =1; // create record
 
-            return Created($"/api/Bot/{id}", id );
+            return Task.FromResult(Created($"/api/Bot/{id}", id ));
 
         }
 
@@ -96,9 +96,9 @@ namespace Api.CryptoBot.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent, Type = typeof(string))]
         [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(string))]
         [Microsoft.AspNetCore.Mvc.HttpPut("{id}")]
-        public override async Task< BotResponseDto > Put(long id, [Microsoft.AspNetCore.Mvc.FromBody]BotRequestDto requestDto)
+        public override Task< BotResponseDto > Put(long id, [Microsoft.AspNetCore.Mvc.FromBody]BotRequestDto requestDto)
         {
-            return null;
+            return Task.FromResult<BotResponseDto>(null);
 
         }
 
@@ -116,20 +116,20 @@ namespace Api.CryptoBot.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent, Type = typeof(void))]
         [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(string))]
         [HttpDelete]
-        public async Task<bool> Delete(int id)
+        public Task<bool> Delete(int id)
         {
-            return true;
+            return Task.FromResult(true);
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet]
         [Microsoft.AspNetCore.Mvc.Route("Search")]
-        public override async Task< BotSearchResponseDto > Search(BotSearchRequestDto searchRequest)
+        public override Task< BotSearchResponseDto > Search(BotSearchRequestDto searchRequest)
         {
             // TODO: lots to do here on the search, just return all for now
-            return new BotSearchResponseDto
+            return Task.FromResult(new BotSearchResponseDto
             {
                 Data = _mapper.Map(_dbContext.Bots, new List<BotResponseDto>())
-            };
+            });
         }
 
 
