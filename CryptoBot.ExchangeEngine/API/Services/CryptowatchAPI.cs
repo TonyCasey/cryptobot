@@ -37,8 +37,8 @@ namespace CryptoBot.ExchangeEngine.API.Services
         public IEnumerable<Candle> GetMarketCandles(string exchange, string marketName, DateTime? before, DateTime? after, params int[] periods)
         {
             string periodString = string.Join(",", periods);
-            string beforeDateString = (before == null ? string.Empty : "&before=" + (long)before.Value.UnixTimestampFromDateTimeSeconds());
-            string afterDateString = (after == null ? string.Empty : "&after=" + (long)after.Value.UnixTimestampFromDateTimeSeconds());
+            string beforeDateString = (before == null ? string.Empty : "&before=" + (long)CryptoBot.ExchangeEngine.CryptoUtility.UnixTimestampFromDateTimeSeconds(before.Value));
+            string afterDateString = (after == null ? string.Empty : "&after=" + (long)CryptoBot.ExchangeEngine.CryptoUtility.UnixTimestampFromDateTimeSeconds(after.Value));
             string url = "/markets/" + exchange + "/" + marketName + "/ohlc?periods=" + periodString + beforeDateString + afterDateString;
             JToken token = MakeCryptowatchRequest(url);
             foreach (JProperty prop in token)
@@ -50,7 +50,7 @@ namespace CryptoBot.ExchangeEngine.API.Services
                         ExchangeName = exchange,
                         Name = marketName,
                         ClosePrice = (decimal)array[4],
-                        Timestamp = CryptoUtility.UnixTimeStampToDateTimeSeconds((long)array[0]),
+                        Timestamp = CryptoBot.ExchangeEngine.CryptoUtility.UnixTimeStampToDateTimeSeconds((long)array[0]),
                         HighPrice = (decimal)array[2],
                         LowPrice = (decimal)array[3],
                         OpenPrice = (decimal)array[1],

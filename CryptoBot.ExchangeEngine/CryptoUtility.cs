@@ -8,7 +8,7 @@ using System.Security;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace CryptoBot.Model.Exchanges
+namespace CryptoBot.ExchangeEngine
 {
     public static class CryptoUtility
     {

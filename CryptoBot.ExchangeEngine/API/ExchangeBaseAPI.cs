@@ -93,7 +93,7 @@ namespace CryptoBot.ExchangeEngine.API
         /// <param name="encryptedFile">Encrypted file to load keys from</param>
         public virtual void LoadAPIKeys(string encryptedFile)
         {
-            SecureString[] strings = CryptoUtility.LoadProtectedStringsFromFile(encryptedFile);
+            SecureString[] strings = API.Exchanges.CryptoUtility.LoadProtectedStringsFromFile(encryptedFile);
             if (strings.Length < 2)
             {
                 throw new InvalidOperationException("Encrypted keys file should have a public and private key, and an optional pass phrase");
