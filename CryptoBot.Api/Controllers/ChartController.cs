@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Api.CryptoBot.Models.DTO.Chart;
 using CryptoBot.Model.Domain;
 using Asp.Versioning;
-using Microsoft.AspNetCore.Server.Kestrel.Internal.System.Text.Encodings.Web.Utf8;
+// Removed obsolete Kestrel Internal reference - not needed in .NET 8
 using Newtonsoft.Json;
 using System.IO;
 using System.Linq;

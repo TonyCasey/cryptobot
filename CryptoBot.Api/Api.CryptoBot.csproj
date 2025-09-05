@@ -46,9 +46,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CryptoBot.Model\CryptoBot.Model.csproj" />
-    <!-- Temporarily removing Core and ExchangeEngine until they're fixed -->
-    <!-- <ProjectReference Include="..\CryptoBot.Core\CryptoBot.Core.csproj" /> -->
-    <!-- <ProjectReference Include="..\CryptoBot.ExchangeEngine\CryptoBot.ExchangeEngine.csproj" /> -->
+    <ProjectReference Include="..\CryptoBot.Core\CryptoBot.Core.csproj" />
+    <ProjectReference Include="..\CryptoBot.ExchangeEngine\CryptoBot.ExchangeEngine.csproj" />
   </ItemGroup>
 
 </Project>

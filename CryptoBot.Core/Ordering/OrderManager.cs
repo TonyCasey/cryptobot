@@ -14,6 +14,7 @@ using CryptoBot.Model.Domain.Bot;
 using CryptoBot.Model.Domain.Market;
 using CryptoBot.Model.Domain.Trading;
 using CryptoBot.Model.Exchanges;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using NLog;
 using Telegram.Bot;
@@ -186,20 +187,20 @@ namespace CryptoBot.Core.Ordering
                         }
                     });
 
-                    SetPositionCommission(order, newPosition);
+                    SetPositionCommission(order, newPosition.Entity);
 
                     _dbContext.SaveChanges();
-                    dbBot.CurrentPositionId = newPosition.PositionId;
+                    dbBot.CurrentPositionId = newPosition.Entity.PositionId;
                     _dbContext.SaveChanges();
 
-                    _inMemoryBot.CurrentPosition = newPosition;
-                    _inMemoryBot.CurrentPositionId = newPosition.PositionId;
+                    _inMemoryBot.CurrentPosition = newPosition.Entity;
+                    _inMemoryBot.CurrentPositionId = newPosition.Entity.PositionId;
 
                     Log(null);
-                    Log($"Created new position {newPosition.PositionId}");
+                    Log($"Created new position {newPosition.Entity.PositionId}");
                     Log(null);
                     SendMessageApp(
-                        $"Buy order filled for {_inMemoryBot.Name} & new position created Id {newPosition.PositionId}. Filled {order.QuantityFilled} of {_inMemoryBot.Coin.Code} at a price of {order.Price}");
+                        $"Buy order filled for {_inMemoryBot.Name} & new position created Id {newPosition.Entity.PositionId}. Filled {order.QuantityFilled} of {_inMemoryBot.Coin.Code} at a price of {order.Price}");
                 }
                 else // bot is in a Buy position and already has an order against it, what's the problem
                 {
@@ -216,7 +217,7 @@ namespace CryptoBot.Core.Ordering
                 currentPosition =
                     _dbContext
                     .Positions
-                    .Include("Orders")
+                    .Include(x => x.Orders)
                     .Single(x => x.PositionId == dbBot.CurrentPositionId);
                 
                 Log($"Updating current position {currentPosition.PositionId}");

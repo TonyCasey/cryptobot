@@ -1,6 +1,5 @@
 ﻿using System;
 using AutoMapper;
-using AutoMapper.Configuration;
 using CryptoBot.Model.Common;
 using CryptoBot.Model.Domain.Account;
 using CryptoBot.Model.Domain.Trading;
@@ -8,18 +7,18 @@ using CryptoBot.Model.Exchanges;
 
 namespace CryptoBot.Core.Mapping
 {
-    public class MappingConfigurator : MapperConfigurationExpression
+    public class MappingConfigurator : Profile
     {
         public MappingConfigurator()
         {
-            Initiallize();
+            Initialize();
         }
 
-        private void Initiallize()
+        private void Initialize()
         {
             CreateMap<ExchangeOrderResult, Order>()
                 .ForMember(m => m.OurRef,
-                    dest => dest.UseValue(Guid.NewGuid()))
+                    dest => dest.MapFrom(src => Guid.NewGuid()))
                 .ForMember(m => m.OrderId,
                     dest => dest.Ignore())
                 .ForMember(m => m.ExchangeOrderId,

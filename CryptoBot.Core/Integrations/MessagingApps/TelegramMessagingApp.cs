@@ -2,16 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using CryptoBot.Database;
 using CryptoBot.Model.Common;
 using CryptoBot.Model.Domain.Account;
 using CryptoBot.Model.Domain.Bot;
 using CryptoBot.Model.Domain.Trading;
+using Microsoft.EntityFrameworkCore;
 using NLog;
 using Telegram.Bot;
-using Telegram.Bot.Args;
+using Telegram.Bot.Polling;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Exceptions;
 
 namespace CryptoBot.Core.Integrations.MessagingApps
 {
@@ -42,8 +46,19 @@ namespace CryptoBot.Core.Integrations.MessagingApps
             }
 
             _telegramBotClient = new TelegramBotClient(token);
-            _telegramBotClient.OnMessage += OnMessage;
-            _telegramBotClient.StartReceiving();
+            
+            // Use new API for receiving messages
+            var receiverOptions = new ReceiverOptions
+            {
+                AllowedUpdates = { } // receive all update types
+            };
+            
+            _telegramBotClient.StartReceiving(
+                HandleUpdateAsync,
+                HandlePollingErrorAsync,
+                receiverOptions,
+                cancellationToken: CancellationToken.None
+            );
 
         }
 
@@ -60,11 +75,19 @@ namespace CryptoBot.Core.Integrations.MessagingApps
 
         }
 
+        // Legacy interface implementation - keeping for compatibility
         public void OnMessage(object sender, EventArgs messageEventArg)
         {
-            var message = ((MessageEventArgs)messageEventArg).Message;
+            // This method is required by IMessagingApp interface but not used with new Telegram.Bot API
+            // The new HandleUpdateAsync method handles message processing
+        }
 
-            if (message == null || message.Type != MessageType.TextMessage) return;
+        private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+        {
+            if (update.Type != UpdateType.Message || update.Message?.Text == null)
+                return;
+
+            var message = update.Message;
 
             if (_chatId == null)
             {
@@ -79,7 +102,7 @@ namespace CryptoBot.Core.Integrations.MessagingApps
                 });
                 _dbContext.SaveChanges();
 
-                _app.MessagingAppSettings.Add(newMessagingAppSettings); // Add to the user in memory
+                _app.MessagingAppSettings.Add(newMessagingAppSettings.Entity); // Add to the user in memory
 
                 Log("Hello world received & chatId saved. Your bot is now set up");
             }
@@ -92,9 +115,10 @@ namespace CryptoBot.Core.Integrations.MessagingApps
                 case "/profit":
 
 
-                    _telegramBotClient.SendTextMessageAsync(_chatId,
+                    await _telegramBotClient.SendTextMessageAsync(_chatId,
                         $"Net profit: {_dbContext.Positions.Where(x => x.Bot.Active).Sum(y => y.NetProfit)}\n" +
-                        $"Percent {_dbContext.Positions.Where(x => x.Bot.Active).Sum(y => y.NetProfitPercent)}%"
+                        $"Percent {_dbContext.Positions.Where(x => x.Bot.Active).Sum(y => y.NetProfitPercent)}%",
+                        cancellationToken: cancellationToken
                     );
 
                     break;
@@ -111,8 +135,8 @@ namespace CryptoBot.Core.Integrations.MessagingApps
 
                     List<Position> positions = _dbContext
                         .Positions
-                        .Include("Bot")
-                        .Include("Bot.Coin")
+                        .Include(x => x.Bot)
+                        .Include(x => x.Bot.Coin)
                         .Where(x => openPositionIds.Contains(x.PositionId))
                         .ToList();
 
@@ -122,11 +146,24 @@ namespace CryptoBot.Core.Integrations.MessagingApps
                         sb.AppendLine("\n-------------------\n");
                     }
 
-                    _telegramBotClient.SendTextMessageAsync(_chatId, sb.ToString());
+                    await _telegramBotClient.SendTextMessageAsync(_chatId, sb.ToString(), cancellationToken: cancellationToken);
 
                     break;
             }
 
+        }
+
+        private Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+        {
+            var errorMessage = exception switch
+            {
+                ApiRequestException apiRequestException
+                    => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
+                _ => exception.ToString()
+            };
+
+            Log($"Telegram polling error: {errorMessage}");
+            return Task.CompletedTask;
         }
 
         private void Log(string message)
