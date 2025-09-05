@@ -119,6 +119,8 @@ namespace CryptoBot.Core.Ordering
                     HandleNonFilledOrder(checkOrderResult, candle);
                 }
             }
+
+            await Task.CompletedTask;
         }
 
         private void Log(string message)

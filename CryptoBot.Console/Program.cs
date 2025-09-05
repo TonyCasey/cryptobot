@@ -41,6 +41,7 @@ namespace CryptoBot
         #region Nested classes to support running as service
         public const string ServiceName = "MyService";
 
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
         public class Service : ServiceBase
         {
             public Service()
@@ -60,7 +61,7 @@ namespace CryptoBot
         }
         #endregion
 
-        private static async void Start(string[] args)
+        private static void Start(string[] args)
         {
             // Load configuration
             var configuration = new ConfigurationBuilder()
@@ -195,6 +196,7 @@ namespace CryptoBot
             // onstop code here
         }
 
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
         public static void Main(string[] args)
         {
             if (!Environment.UserInteractive)

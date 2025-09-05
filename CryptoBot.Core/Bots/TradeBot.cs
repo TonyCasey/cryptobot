@@ -187,10 +187,7 @@ namespace CryptoBot.Core.Bots
                 if (candle == null)
                     return false;
             }
-            else
-            {
-                var a = "yes";
-            }
+            // else block - no action needed for existing candles
 
             Log($"*** Adding Candle for Exchange {_bot.Exchange.Name} Coin {_bot.Coin.Code} TimeStamp {candle.Timestamp:F}, OpenPrice {candle.OpenPrice} ClosePrice {candle.ClosePrice}");
             _candles.Add(candle);

@@ -257,6 +257,7 @@ namespace CryptoBot.ExchangeEngine
         /// </summary>
         /// <param name="path">Path to load from</param>
         /// <returns>Protected data</returns>
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
         public static SecureString[] LoadProtectedStringsFromFile(string path)
         {
             byte[] bytes = File.ReadAllBytes(path);
@@ -306,6 +307,7 @@ namespace CryptoBot.ExchangeEngine
         /// }
         /// Console.ReadLine();
         /// ]]></example>
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
         public static void SaveUnprotectedStringsToFile(string path, string[] strings)
         {
             MemoryStream memory = new MemoryStream();
