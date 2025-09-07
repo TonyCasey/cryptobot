@@ -9,7 +9,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Api.CryptoBot.Models.DTO.Chart;
 using CryptoBot.Model.Domain;
-using Microsoft.AspNetCore.Server.Kestrel.Internal.System.Text.Encodings.Web.Utf8;
+using System.Text.Encodings.Web;
 using Newtonsoft.Json;
 using System.IO;
 using System.Linq;
@@ -22,7 +22,7 @@ using CryptoBot.Model.Common;
 using CryptoBot.Model.Domain.Market;
 using CryptoBot.Model.Exchanges;
 using Microsoft.AspNetCore.Cors;
-using CryptoUtility = CryptoBot.ExchangeEngine.API.Exchanges.CryptoUtility;
+using CryptoUtility = CryptoBot.Model.Exchanges.CryptoUtility;
 
 namespace Api.CryptoBot.Controllers
 {

@@ -8,7 +8,7 @@ using CryptoBot.Model.Exchanges;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NLog;
 using System;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using CryptoBot.Core.Integrations.MessagingApps;
 using CryptoBot.Database;
@@ -29,7 +29,9 @@ namespace CryptoBot.Tests.Orders
         [TestInitialize]
         public void Initiatize()
         {
-            _dbContext = new CryptoBotDbContext();                        
+            var optionsBuilder = new DbContextOptionsBuilder<CryptoBotDbContext>();
+            optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=CryptoBot_Dev;Integrated Security=true");
+            _dbContext = new CryptoBotDbContext(optionsBuilder.Options);                        
             _logger = LogManager.GetCurrentClassLogger();
             _user = _dbContext
                 .Users

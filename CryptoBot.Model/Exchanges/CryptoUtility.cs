@@ -150,10 +150,7 @@ namespace CryptoBot.Model.Exchanges
         public static byte[] GenerateSalt(int length)
         {
             byte[] salt = new byte[length];
-            using (var rng = new RNGCryptoServiceProvider())
-            {
-                rng.GetBytes(salt);
-            }
+            RandomNumberGenerator.Fill(salt);
             return salt;
         }
 
@@ -162,14 +159,12 @@ namespace CryptoBot.Model.Exchanges
             using (var encrypted = new FileStream(file, FileMode.Create, FileAccess.Write))
             {
                 byte[] salt = GenerateSalt(32);
-                var AES = new RijndaelManaged()
-                {
-                    KeySize = 256,
-                    BlockSize = 128,
-                    Padding = PaddingMode.PKCS7,
-                };
+                var AES = Aes.Create();
+                AES.KeySize = 256;
+                AES.BlockSize = 128;
+                AES.Padding = PaddingMode.PKCS7;
 
-                var key = new Rfc2898DeriveBytes(password, salt, 1024);
+                var key = new Rfc2898DeriveBytes(password, salt, 1024, HashAlgorithmName.SHA256);
                 AES.Key = key.GetBytes(AES.KeySize / 8);
                 AES.IV = key.GetBytes(AES.BlockSize / 8);
 
@@ -195,14 +190,12 @@ namespace CryptoBot.Model.Exchanges
                 byte[] salt = new byte[32];
                 input.Read(salt, 0, 32);
 
-                var AES = new RijndaelManaged()
-                {
-                    KeySize = 256,
-                    BlockSize = 128,
-                    Padding = PaddingMode.PKCS7,
-                };
+                var AES = Aes.Create();
+                AES.KeySize = 256;
+                AES.BlockSize = 128;
+                AES.Padding = PaddingMode.PKCS7;
 
-                var key = new Rfc2898DeriveBytes(password, salt, 1024);
+                var key = new Rfc2898DeriveBytes(password, salt, 1024, HashAlgorithmName.SHA256);
                 AES.Key = key.GetBytes(AES.KeySize / 8);
                 AES.IV = key.GetBytes(AES.BlockSize / 8);
 

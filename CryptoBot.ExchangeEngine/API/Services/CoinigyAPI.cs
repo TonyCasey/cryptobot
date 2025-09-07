@@ -29,7 +29,7 @@ namespace CryptoBot.ExchangeEngine.API.Services
             string url =
             $"/getjson/chart_feed/{exchange.Code}/{coin.Code}/{baseCoin.Code}/{(int)candleSize}/{fromDateTimeUnixTimestamp}/{toDateTimeUnixTimeStamp}";
 
-            var request = new RestRequest(url, Method.GET);
+            var request = new RestRequest(url, Method.Get);
       
             try
             {

@@ -14,7 +14,7 @@ using CryptoBot.Model.Exchanges;
 using NLog;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.ServiceProcess;
 using System.Threading;
@@ -62,7 +62,9 @@ namespace CryptoBot
         private static async void Start(string[] args)
         {
             // onstart code here
-            _dbContext = new CryptoBotDbContext();
+            var optionsBuilder = new DbContextOptionsBuilder<CryptoBotDbContext>();
+            optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=CryptoBot_Dev;Integrated Security=true");
+            _dbContext = new CryptoBotDbContext(optionsBuilder.Options);
             _logger = LogManager.GetCurrentClassLogger();
             _messageDispatcher = new MessageDispatcher();
             _indicatorFactoryWrapper = new IndicatorFactoryWrapper();

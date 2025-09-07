@@ -2,7 +2,7 @@
 
 using CryptoBot.Model.Exchanges;
 using Newtonsoft.Json.Linq;
-using RestSharp.Extensions.MonoHttp;
+using System.Web;
 using System;
 using System.Collections.Generic;
 using System.Net;

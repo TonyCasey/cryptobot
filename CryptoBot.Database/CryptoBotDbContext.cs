@@ -1,6 +1,5 @@
-﻿using System;
-using System.Data.Entity;
-using System.Data.Entity.ModelConfiguration.Conventions;
+using System;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using CryptoBot.Model.Domain;
 using CryptoBot.Model.Domain.Account;
@@ -32,7 +31,7 @@ namespace CryptoBot.Database
         public virtual DbSet<MessagingApp> MessagingApps { get; set; }
         public virtual DbSet<MessagingAppSettings> MessagingAppSettings { get; set; }
 
-        public CryptoBotDbContext() : base("name=DBConnectionString")
+        public CryptoBotDbContext(DbContextOptions<CryptoBotDbContext> options) : base(options)
         {
             
         }
@@ -54,7 +53,7 @@ namespace CryptoBot.Database
                 Logger = LogManager.GetCurrentClassLogger();
                 Logger.Error(e.Message);
                 Logger.Error(e.InnerException);
-                throw e;
+                throw;
             }
         }
 
@@ -82,31 +81,32 @@ namespace CryptoBot.Database
             }
         }
 
-
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             modelBuilder.Entity<Bot>()
-                .HasRequired(c => c.BaseCoin)
+                .HasOne(c => c.BaseCoin)
                 .WithMany()
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
             
             modelBuilder.Entity<Bot>()
-                .HasRequired(c => c.Coin)
+                .HasOne(c => c.Coin)
                 .WithMany()
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            
-            
-            modelBuilder.Conventions.Remove<ManyToManyCascadeDeleteConvention>();
-            modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();
-
-            modelBuilder.Conventions.Remove<DecimalPropertyConvention>();
-            modelBuilder.Conventions.Add(new DecimalPropertyConvention(38, 18));
+            // Configure decimal properties with precision
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (property.ClrType == typeof(decimal) || property.ClrType == typeof(decimal?))
+                    {
+                        property.SetPrecision(38);
+                        property.SetScale(18);
+                    }
+                }
+            }
 
             base.OnModelCreating(modelBuilder);
         }
-
-        
     }
 }

@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.Remoting.Messaging;
+using CryptoBot.Model.Common;
 
 namespace CryptoBot.Core.Messaging
 {
+
     public class MessageDispatcher
     {
         

@@ -14,6 +14,7 @@ using CryptoBot.Model.Domain.Bot;
 using CryptoBot.Model.Domain.Market;
 using CryptoBot.Model.Domain.Trading;
 using CryptoBot.Model.Exchanges;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using NLog;
 using Telegram.Bot;
@@ -171,7 +172,7 @@ namespace CryptoBot.Core.Ordering
             {
                 if (currentPosition == null)
                 {
-                    var newPosition = _dbContext.Positions.Add(new Position
+                    var newPosition = new Position
                     {
                         BotId = _inMemoryBot.BotId,
                         Side = Enumerations.OrderSideEnum.Buy,
@@ -184,7 +185,9 @@ namespace CryptoBot.Core.Ordering
                         {
                             order
                         }
-                    });
+                    };
+                    
+                    _dbContext.Positions.Add(newPosition);
 
                     SetPositionCommission(order, newPosition);
 

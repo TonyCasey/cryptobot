@@ -13,7 +13,6 @@ namespace CryptoBot.IndicatrorEngine.Crossing
     public class CloseOpenCrossIndicator : IIndicatorEngine
     {
         private readonly Logger _logger;
-        private List<Candle> _groupedCandles;
 
         public CloseOpenCrossIndicator(Logger logger)
         {

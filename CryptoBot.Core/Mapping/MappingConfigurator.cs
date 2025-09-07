@@ -19,7 +19,7 @@ namespace CryptoBot.Core.Mapping
         {
             CreateMap<ExchangeOrderResult, Order>()
                 .ForMember(m => m.OurRef,
-                    dest => dest.UseValue(Guid.NewGuid()))
+                    dest => dest.MapFrom(src => Guid.NewGuid()))
                 .ForMember(m => m.OrderId,
                     dest => dest.Ignore())
                 .ForMember(m => m.ExchangeOrderId,

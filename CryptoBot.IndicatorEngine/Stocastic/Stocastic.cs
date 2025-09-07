@@ -9,7 +9,7 @@ using CryptoBot.Model.Domain.Bot;
 using CryptoBot.Model.Domain.Market;
 using Newtonsoft.Json;
 using NLog;
-using TicTacTec.TA.Library;
+using TALib;
 
 namespace CryptoBot.IndicatrorEngine.Stocastic
 {
@@ -24,40 +24,47 @@ namespace CryptoBot.IndicatrorEngine.Stocastic
 
         public Enumerations.IndicatorSignalEnum GetIndicatorPosition(List<Candle> candles, List<RuleSet> ruleSets)
         {
-            var inHigh = candles.Select(x => (float) x.HighPrice).ToArray();
-            var inLow = candles.Select(x => (float) x.LowPrice).ToArray();
-            var inClose = candles.Select(x => (float) x.ClosePrice).ToArray();
+            var highs = candles.Select(x => (double)x.HighPrice).ToArray();
+            var lows = candles.Select(x => (double)x.LowPrice).ToArray();
+            var closes = candles.Select(x => (double)x.ClosePrice).ToArray();
 
-            int startIndex = 0, endIndex = inHigh.Length - 1;
-            int outBegIndex = 0, outNbElement = 0;
+            var inHigh = new ReadOnlySpan<double>(highs);
+            var inLow = new ReadOnlySpan<double>(lows);
+            var inClose = new ReadOnlySpan<double>(closes);
+            var inRange = Range.EndAt(closes.Length);
+
             int optInFastKPeriod = 14, optInSlowKPeriod = 1, optInSlowDPeriod = 3;
             
+            var outSlowK = new double[closes.Length].AsSpan();
+            var outSlowD = new double[closes.Length].AsSpan();
 
-            double[] outSlowK = new double[endIndex]; 
-            double[] outSlowD = new double[endIndex];
+            var response = Functions.Stoch(inHigh, inLow, inClose, inRange, outSlowK, outSlowD,
+                out Range outRange, optInFastKPeriod, optInSlowKPeriod, Core.MAType.Sma, optInSlowDPeriod, Core.MAType.Sma);
 
-            var response = TicTacTec.TA.Library.Core.Stoch(startIndex, endIndex, inHigh, inLow, inClose,
-                optInFastKPeriod, optInSlowKPeriod, Core.MAType.Sma, optInSlowDPeriod, Core.MAType.Sma, out outBegIndex,
-                out outNbElement, outSlowK, outSlowD);
-
-            if (response != Core.RetCode.Success || (!outSlowK.Any() || outSlowK[0] <= 0) ) 
+            if (response != Core.RetCode.Success || outRange.End.Value <= outRange.Start.Value) 
             {
                 return Enumerations.IndicatorSignalEnum.None;
             }
 
-            // Check for signals
-            bool sell =
-                CheckRuleSets(ruleSets.Where(x => x.RuleSide == IndicatorRulesEnumerations.RuleSideEnum.Sell), outSlowK[outSlowK.Length - (optInFastKPeriod+1) ], outSlowD[outSlowD.Length- (optInFastKPeriod+1)]);
+            var length = outRange.End.Value - outRange.Start.Value;
+            if (length == 0)
+            {
+                return Enumerations.IndicatorSignalEnum.None;
+            }
 
-            bool buy =
-                CheckRuleSets(ruleSets.Where(x => x.RuleSide == IndicatorRulesEnumerations.RuleSideEnum.Buy), outSlowK[outSlowK.Length - (optInFastKPeriod+1)], outSlowD[outSlowD.Length - (optInFastKPeriod+1)]);
+            // Get the last values for comparison
+            var lastSlowK = outSlowK[length - 1];
+            var lastSlowD = outSlowD[length - 1];
+
+            // Check for signals
+            bool sell = CheckRuleSets(ruleSets.Where(x => x.RuleSide == IndicatorRulesEnumerations.RuleSideEnum.Sell), lastSlowK, lastSlowD);
+            bool buy = CheckRuleSets(ruleSets.Where(x => x.RuleSide == IndicatorRulesEnumerations.RuleSideEnum.Buy), lastSlowK, lastSlowD);
 
             if (sell)
                 return Enumerations.IndicatorSignalEnum.Sell;
 
             if (buy)
                 return Enumerations.IndicatorSignalEnum.Buy;
-
 
             return Enumerations.IndicatorSignalEnum.None;
         }

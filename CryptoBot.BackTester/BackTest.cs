@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,7 +38,9 @@ namespace CryptoBot.BackTester
         [TestInitialize]
         public void Initiatize()
         {
-            _dbContext = new CryptoBotDbContext();
+            var optionsBuilder = new DbContextOptionsBuilder<CryptoBotDbContext>();
+            optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=CryptoBot_Dev;Integrated Security=true");
+            _dbContext = new CryptoBotDbContext(optionsBuilder.Options);
             _logger = LogManager.GetCurrentClassLogger();
             new MappingConfigurator();
             _messageDispatcher = new MessageDispatcher();

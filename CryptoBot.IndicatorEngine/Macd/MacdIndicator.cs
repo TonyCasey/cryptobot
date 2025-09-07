@@ -9,7 +9,7 @@ using CryptoBot.Model.Domain.Bot;
 using CryptoBot.Model.Domain.Market;
 using Newtonsoft.Json;
 using NLog;
-using TicTacTec.TA.Library;
+using TALib;
 
 namespace CryptoBot.IndicatrorEngine.Macd
 {
@@ -26,7 +26,7 @@ namespace CryptoBot.IndicatrorEngine.Macd
         {
             
 
-            var closingFloats = candles.Select(x => (float) x.ClosePrice).ToArray();
+            var closingDoubles = candles.Select(x => (double)x.ClosePrice).ToArray();
 
             /**
              *  The initial values given by the MACD here always seem to be off.
@@ -34,37 +34,41 @@ namespace CryptoBot.IndicatrorEngine.Macd
              *  They are very accurate once they do.
              */
 
-            int startIndex = 0, endIndex = closingFloats.Length - 1;
-            int outBegIndex = 0, outNbElement = 0;
-            double[] outMacd = new double[endIndex];
-            double[] outMacdSignal = new double[endIndex];
-            double[] outMacdHistogram = new double[endIndex];
+            var inReal = new ReadOnlySpan<double>(closingDoubles);
+            var inRange = Range.EndAt(closingDoubles.Length);
+            
+            var outMacd = new double[closingDoubles.Length].AsSpan();
+            var outMacdSignal = new double[closingDoubles.Length].AsSpan();
+            var outMacdHistogram = new double[closingDoubles.Length].AsSpan();
             int fastLength = 12, slowLength = 26, signalSmoothing = 9;
 
-            var response = TicTacTec.TA.Library.Core.Macd(startIndex, endIndex, closingFloats, fastLength, slowLength,
-                signalSmoothing, out outBegIndex, out outNbElement, outMacd, outMacdSignal, outMacdHistogram);            
+            var response = Functions.Macd(inReal, inRange, outMacd, outMacdSignal, outMacdHistogram,
+                out Range outRange, fastLength, slowLength, signalSmoothing);            
 
             List<Model.Macd> macds = new List<Model.Macd>();
 
             if (response == Core.RetCode.Success)
             {
-                if (candles.Any() && outBegIndex > 0 && candles.Count() > outBegIndex)
+                var startOffset = outRange.Start.Value;
+                var length = outRange.End.Value - outRange.Start.Value;
+
+                if (candles.Any() && length > 0)
                 {
-                    int index = candles.Count() - 1 - outBegIndex;
-
-                    for (int i = 0; i <= index; i++)
+                    for (int i = 0; i < length; i++)
                     {
-                        macds.Add(new Model.Macd
+                        var candleIndex = startOffset + i;
+                        if (candleIndex < candles.Count)
                         {
-                            MacdSignalValue = outMacdSignal[i],
-                            MacdValue = outMacd[i],
-                            HistogramValue = outMacdHistogram[i],
-                            Candle = candles.ElementAt(outBegIndex + i)
-                        });
+                            macds.Add(new Model.Macd
+                            {
+                                MacdSignalValue = outMacdSignal[i],
+                                MacdValue = outMacd[i],
+                                HistogramValue = outMacdHistogram[i],
+                                Candle = candles[candleIndex]
+                            });
+                        }
                     }
-
                 }
-
             }
 
 

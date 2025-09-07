@@ -3,7 +3,7 @@ using CryptoBot.Model.Exchanges;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NLog;
-using RestSharp.Extensions.MonoHttp;
+using System.Web;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
