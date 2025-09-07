@@ -63,7 +63,7 @@ namespace CryptoBot.Core.Trading
             }
         }
         
-        public async Task<ExchangeOrderResult> Buy(Bot bot, decimal price)
+        public Task<ExchangeOrderResult> Buy(Bot bot, decimal price)
         {
             _exchangeApi = GetExchange(bot);
             
@@ -71,7 +71,7 @@ namespace CryptoBot.Core.Trading
             switch (bot.OrderType)
             {
                 case Enumerations.OrderTypeEnum.Market:
-                    return Buy(bot.BaseCoin, bot.Coin, bot.Amount, null, Enumerations.OrderTypeEnum.Market);
+                    return Task.FromResult(Buy(bot.BaseCoin, bot.Coin, bot.Amount, null, Enumerations.OrderTypeEnum.Market));
                 case Enumerations.OrderTypeEnum.Limit:
                     
                    
@@ -93,7 +93,7 @@ namespace CryptoBot.Core.Trading
 
                         decimal quantity = Math.Round( bot.Amount / bestAsk.Price, bot.Coin.OrderRoundingExponent);
                         
-                        return Buy(bot.BaseCoin, bot.Coin, quantity, bestAsk.Price, Enumerations.OrderTypeEnum.Market);
+                        return Task.FromResult(Buy(bot.BaseCoin, bot.Coin, quantity, bestAsk.Price, Enumerations.OrderTypeEnum.Market));
                     }
 
                     throw new Exception("Couldn't place a buy order");
@@ -102,10 +102,10 @@ namespace CryptoBot.Core.Trading
                     throw new NotImplementedException();
             }
 
-            return null;
+            return Task.FromResult<ExchangeOrderResult>(null);
         }
 
-        public async Task<ExchangeOrderResult> Sell(Bot bot, decimal price)
+        public Task<ExchangeOrderResult> Sell(Bot bot, decimal price)
         {
             _exchangeApi = GetExchange(bot);
 
@@ -117,7 +117,7 @@ namespace CryptoBot.Core.Trading
             switch (bot.OrderType)
             {
                 case Enumerations.OrderTypeEnum.Market:
-                    return Sell(bot.BaseCoin, bot.Coin, quantity, null, Enumerations.OrderTypeEnum.Market);
+                    return Task.FromResult(Sell(bot.BaseCoin, bot.Coin, quantity, null, Enumerations.OrderTypeEnum.Market));
                 case Enumerations.OrderTypeEnum.Limit:
 
                     // get the best bid
@@ -136,7 +136,7 @@ namespace CryptoBot.Core.Trading
                     {
                         ExchangeOrderPrice bestBid = orderBook.Bids.First();
                         
-                        return Sell(bot.BaseCoin, bot.Coin, quantity, bestBid.Price, Enumerations.OrderTypeEnum.Market);
+                        return Task.FromResult(Sell(bot.BaseCoin, bot.Coin, quantity, bestBid.Price, Enumerations.OrderTypeEnum.Market));
                     }
                     break;
 

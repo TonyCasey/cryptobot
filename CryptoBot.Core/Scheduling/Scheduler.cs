@@ -142,11 +142,8 @@ namespace CryptoBot.Core.Scheduling
                     }
                 case Enumerations.SchedulerType.ScheduledEventOccursEveryValueInSeconds:
                 {
-                    var theNextDateTimeToRunAt =
-                        new DateTime(DateTime.UtcNow.AddMinutes(1).Year, DateTime.UtcNow.AddMinutes(1).Month,
-                            DateTime.UtcNow.AddMinutes(1).Day, DateTime.UtcNow.AddMinutes(1).Hour, 0, 0);
-
-                    return theNextDateTimeToRunAt.Subtract(DateTime.UtcNow);
+                    // Simply return the interval specified
+                    return TimeSpan.FromSeconds(schedulerValueInSeconds);
                 }
                 default:
                     {

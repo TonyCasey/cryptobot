@@ -1,0 +1,50 @@
+# Simplified docker-compose for local development
+# Uses locally installed SQL Server Express instead of Docker container
+
+services:
+  # CryptoBot API Development
+  cryptobot-api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: api-dev
+    container_name: cryptobot-api-dev
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000;https://+:5001
+      # Use local SQL Server Express (adjust server name as needed)
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal\\SQLEXPRESS;Database=CryptoBot;Integrated Security=false;User Id=sa;Password=CryptoBot@2024!;
+    networks:
+      - cryptobot-network
+    volumes:
+      - ./CryptoBot.Api:/app
+      - ./CryptoBot.Model:/src/CryptoBot.Model
+      - ./CryptoBot.Core:/src/CryptoBot.Core
+      - ./CryptoBot.ExchangeEngine:/src/CryptoBot.ExchangeEngine
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Angular UI Development
+  cryptobot-ui-dev:
+    build:
+      context: ./CryptoBot.UI
+      dockerfile: ../Dockerfile.dev
+      target: ui-dev
+    container_name: cryptobot-ui-dev
+    ports:
+      - "3003:3003"
+      - "49153:49153"  # Webpack hot reload
+    environment:
+      - NODE_ENV=development
+    networks:
+      - cryptobot-network
+    volumes:
+      - ./CryptoBot.UI:/app
+      - /app/node_modules
+
+networks:
+  cryptobot-network:
+    driver: bridge

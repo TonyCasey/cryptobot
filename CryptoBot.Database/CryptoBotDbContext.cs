@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Data.Entity;
-using System.Data.Entity.ModelConfiguration.Conventions;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using CryptoBot.Model.Domain;
 using CryptoBot.Model.Domain.Account;
@@ -32,7 +31,15 @@ namespace CryptoBot.Database
         public virtual DbSet<MessagingApp> MessagingApps { get; set; }
         public virtual DbSet<MessagingAppSettings> MessagingAppSettings { get; set; }
 
-        public CryptoBotDbContext() : base("name=DBConnectionString")
+        public CryptoBotDbContext(DbContextOptions<CryptoBotDbContext> options) : base(options)
+        {
+            
+        }
+
+        /// <summary>
+        /// Parameterless constructor for mocking in unit tests
+        /// </summary>
+        protected CryptoBotDbContext() : base()
         {
             
         }
@@ -54,7 +61,7 @@ namespace CryptoBot.Database
                 Logger = LogManager.GetCurrentClassLogger();
                 Logger.Error(e.Message);
                 Logger.Error(e.InnerException);
-                throw e;
+                throw;
             }
         }
 
@@ -83,26 +90,33 @@ namespace CryptoBot.Database
         }
 
 
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
+            // Configure Bot relationships
             modelBuilder.Entity<Bot>()
-                .HasRequired(c => c.BaseCoin)
+                .HasOne(c => c.BaseCoin)
                 .WithMany()
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
             
             modelBuilder.Entity<Bot>()
-                .HasRequired(c => c.Coin)
+                .HasOne(c => c.Coin)
                 .WithMany()
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            
-            
-            modelBuilder.Conventions.Remove<ManyToManyCascadeDeleteConvention>();
-            modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();
+            // Configure decimal precision for all decimal properties
+            foreach (var property in modelBuilder.Model.GetEntityTypes()
+                .SelectMany(t => t.GetProperties())
+                .Where(p => p.ClrType == typeof(decimal) || p.ClrType == typeof(decimal?)))
+            {
+                property.SetColumnType("decimal(38, 18)");
+            }
 
-            modelBuilder.Conventions.Remove<DecimalPropertyConvention>();
-            modelBuilder.Conventions.Add(new DecimalPropertyConvention(38, 18));
+            // Disable cascade delete globally
+            foreach (var relationship in modelBuilder.Model.GetEntityTypes()
+                .SelectMany(e => e.GetForeignKeys()))
+            {
+                relationship.DeleteBehavior = DeleteBehavior.Restrict;
+            }
 
             base.OnModelCreating(modelBuilder);
         }

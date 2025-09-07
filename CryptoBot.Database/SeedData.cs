@@ -1360,9 +1360,9 @@ namespace CryptoBot.Database
                 {
                     User = context.Users.First(),
                     Exchange = context.Exchanges.Single(x => x.Code == "GDAX"),
-                    Url = "https://api.gdax.com",
+                    Url = "https://api.exchange.coinbase.com",
                     ComissionRate = 0.25,
-                    SocketUrl = "wss://ws-feed.gdax.com",
+                    SocketUrl = "wss://ws-feed.exchange.coinbase.com",
                     Simulated = true
                 });
 

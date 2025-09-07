@@ -1,0 +1,48 @@
+# Docker Compose for Windows containers
+# Use this if you're running Windows containers instead of Linux containers
+
+services:
+  # SQL Server Express for Windows
+  sqlserver:
+    image: mcr.microsoft.com/windows/servercore:ltsc2022
+    container_name: cryptobot-db
+    command: powershell -Command "Start-Service MSSQLSERVER; while ($true) { Start-Sleep -Seconds 3600 }"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=CryptoBot@2024!
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    networks:
+      - cryptobot-network
+
+  # CryptoBot Application
+  cryptobot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cryptobot-app
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=CryptoBot;User Id=sa;Password=CryptoBot@2024!;
+      - GDAX__ApiKey=${GDAX_API_KEY:-}
+      - GDAX__ApiSecret=${GDAX_API_SECRET:-}
+      - GDAX__Passphrase=${GDAX_PASSPHRASE:-}
+    depends_on:
+      - sqlserver
+    networks:
+      - cryptobot-network
+    volumes:
+      - ./logs:/app/logs
+      - ./config:/app/config
+
+networks:
+  cryptobot-network:
+    driver: nat
+
+volumes:
+  sqlserver-data:

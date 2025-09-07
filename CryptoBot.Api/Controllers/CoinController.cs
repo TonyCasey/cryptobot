@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Api.CryptoBot.Models.DTO.Coin;
 using Api.CryptoBot.Models.Extensions;
 using CryptoBot.Model.Domain;
+using Asp.Versioning;
 
 namespace Api.CryptoBot.Controllers
 {
@@ -24,7 +25,7 @@ namespace Api.CryptoBot.Controllers
     public class CoinController : BaseController< CoinRequestDto, CoinResponseDto, CoinSearchRequestDto, CoinSearchResponseDto >
     {
 
-        private readonly IMapper _mapper;
+        private new readonly IMapper _mapper;
         private readonly CryptoBotApiDbContext _dbContext;
 
         /// <summary>
@@ -51,9 +52,9 @@ namespace Api.CryptoBot.Controllers
         /// <response code="200">Coin found - body contains data</response>
         /// <response code="404">Coin does not exist</response>
         [Microsoft.AspNetCore.Mvc.HttpGet("{coinId}")]
-        public override async Task< CoinResponseDto > Get(long coinId)
+        public override Task< CoinResponseDto > Get(long coinId)
         {
-            return _mapper.Map(_dbContext.Coins.FirstOrDefault(x=>x.CoinId == coinId), new CoinResponseDto());
+            return Task.FromResult(_mapper.Map(_dbContext.Coins.FirstOrDefault(x=>x.CoinId == coinId), new CoinResponseDto()));
         }
 
         // POST: api/Coin
@@ -68,12 +69,12 @@ namespace Api.CryptoBot.Controllers
         [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(Uri))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(void))]
         [Microsoft.AspNetCore.Mvc.HttpPost]
-        public override async Task<CreatedResult> Post([Microsoft.AspNetCore.Mvc.FromBody]CoinRequestDto requestDto)
+        public override Task<CreatedResult> Post([Microsoft.AspNetCore.Mvc.FromBody]CoinRequestDto requestDto)
         {
 
             var id =1; // create record
 
-            return Created($"/api/Coin/{id}", id );
+            return Task.FromResult(Created($"/api/Coin/{id}", id ));
 
         }
 
@@ -93,9 +94,9 @@ namespace Api.CryptoBot.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent, Type = typeof(string))]
         [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(string))]
         [Microsoft.AspNetCore.Mvc.HttpPut("{coinId}")]
-        public override async Task< CoinResponseDto > Put(long coinId, [Microsoft.AspNetCore.Mvc.FromBody]CoinRequestDto requestDto)
+        public override Task< CoinResponseDto > Put(long coinId, [Microsoft.AspNetCore.Mvc.FromBody]CoinRequestDto requestDto)
         {
-            return null;
+            return Task.FromResult<CoinResponseDto>(null);
 
         }
 
@@ -113,14 +114,14 @@ namespace Api.CryptoBot.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent, Type = typeof(void))]
         [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(string))]
         [HttpDelete]
-        public async Task<bool> Delete(int coinId)
+        public Task<bool> Delete(int coinId)
         {
-            return true;
+            return Task.FromResult(true);
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet]
         [Microsoft.AspNetCore.Mvc.Route("Search")]
-        public override async Task<CoinSearchResponseDto> Search(CoinSearchRequestDto searchRequest)
+        public override Task<CoinSearchResponseDto> Search(CoinSearchRequestDto searchRequest)
         {
             CoinSearchResponseDto result = new CoinSearchResponseDto
             {
@@ -129,7 +130,7 @@ namespace Api.CryptoBot.Controllers
                     .FilterByCode(searchRequest.Code),
                     new List<CoinResponseDto>())
             };
-            return result;
+            return Task.FromResult(result);
         }
 
 

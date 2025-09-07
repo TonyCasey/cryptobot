@@ -1,15 +1,4 @@
-﻿/*
-MIT LICENSE
-
-Copyright 2017 Digital Ruby, LLC - http://www.digitalruby.com
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-
+﻿
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,9 +7,8 @@ using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace CryptoBot.ExhangeEngine
+namespace CryptoBot.ExchangeEngine
 {
     public static class CryptoUtility
     {
@@ -162,7 +150,7 @@ namespace CryptoBot.ExhangeEngine
         public static byte[] GenerateSalt(int length)
         {
             byte[] salt = new byte[length];
-            using (var rng = new RNGCryptoServiceProvider())
+            using (var rng = RandomNumberGenerator.Create())
             {
                 rng.GetBytes(salt);
             }
@@ -174,14 +162,12 @@ namespace CryptoBot.ExhangeEngine
             using (var encrypted = new FileStream(file, FileMode.Create, FileAccess.Write))
             {
                 byte[] salt = GenerateSalt(32);
-                var AES = new RijndaelManaged()
-                {
-                    KeySize = 256,
-                    BlockSize = 128,
-                    Padding = PaddingMode.PKCS7,
-                };
+                var AES = Aes.Create();
+                AES.KeySize = 256;
+                AES.BlockSize = 128;
+                AES.Padding = PaddingMode.PKCS7;
 
-                var key = new Rfc2898DeriveBytes(password, salt, 1024);
+                var key = new Rfc2898DeriveBytes(password, salt, 1024, HashAlgorithmName.SHA256);
                 AES.Key = key.GetBytes(AES.KeySize / 8);
                 AES.IV = key.GetBytes(AES.BlockSize / 8);
 
@@ -207,14 +193,12 @@ namespace CryptoBot.ExhangeEngine
                 byte[] salt = new byte[32];
                 input.Read(salt, 0, 32);
 
-                var AES = new RijndaelManaged()
-                {
-                    KeySize = 256,
-                    BlockSize = 128,
-                    Padding = PaddingMode.PKCS7,
-                };
+                var AES = Aes.Create();
+                AES.KeySize = 256;
+                AES.BlockSize = 128;
+                AES.Padding = PaddingMode.PKCS7;
 
-                var key = new Rfc2898DeriveBytes(password, salt, 1024);
+                var key = new Rfc2898DeriveBytes(password, salt, 1024, HashAlgorithmName.SHA256);
                 AES.Key = key.GetBytes(AES.KeySize / 8);
                 AES.IV = key.GetBytes(AES.BlockSize / 8);
 
@@ -273,6 +257,7 @@ namespace CryptoBot.ExhangeEngine
         /// </summary>
         /// <param name="path">Path to load from</param>
         /// <returns>Protected data</returns>
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
         public static SecureString[] LoadProtectedStringsFromFile(string path)
         {
             byte[] bytes = File.ReadAllBytes(path);
@@ -322,6 +307,7 @@ namespace CryptoBot.ExhangeEngine
         /// }
         /// Console.ReadLine();
         /// ]]></example>
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
         public static void SaveUnprotectedStringsToFile(string path, string[] strings)
         {
             MemoryStream memory = new MemoryStream();

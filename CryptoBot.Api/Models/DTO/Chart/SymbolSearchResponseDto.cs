@@ -10,7 +10,7 @@ namespace Api.CryptoBot.Models.DTO.Chart
     public class SymbolSearchResponseDto 
     {
         [JsonProperty("symbol")]
-        public new string Name { get; set; }
+        public string Name { get; set; }
 
         [JsonProperty("full_name")]
         public string FullName { get; set; }

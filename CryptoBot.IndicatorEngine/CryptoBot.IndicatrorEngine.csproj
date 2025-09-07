@@ -1,78 +1,22 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CF988BC1-3839-4721-9D71-0BD80ECE325E}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>CryptoBot.IndicatrorEngine</RootNamespace>
-    <AssemblyName>CryptoBot.Indicatrors</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <AssemblyName>CryptoBot.IndicatrorEngine</AssemblyName>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.4.12\lib\net45\NLog.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="TA-Lib-Core, Version=1.0.4998.21369, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TA-Lib.0.5.0.3\lib\TA-Lib-Core.dll</HintPath>
-    </Reference>
+    <PackageReference Include="NLog" Version="5.2.8" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <!-- TA-Lib needs special handling for .NET Core/8 -->
+    <PackageReference Include="TALib.NETCore" Version="0.5.0" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Crossing\CloseOpenCrossIndicator.cs" />
-    <Compile Include="Extensions\UtilityExtensions.cs" />
-    <Compile Include="IIndicator.cs" />
-    <Compile Include="IIndicatorResult.cs" />
-    <Compile Include="IIndicatorFactoryWrapper.cs" />
-    <Compile Include="IndicatorFactory.cs" />
-    <Compile Include="IndicatorFactoryWrapper.cs" />
-    <Compile Include="Model\Macd.cs" />
-    <Compile Include="Macd\MacdIndicator.cs" />
-    <Compile Include="Extensions\MacdExtensions.cs" />
-    <Compile Include="Model\IndicatorResult.cs" />
-    <Compile Include="Model\MacdIndicatorResult.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Stocastic\Stocastic.cs" />
-    <Compile Include="Volume\VolumeIndicator.cs" />
+    <ProjectReference Include="..\CryptoBot.Model\CryptoBot.Model.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CryptoBot.Model\CryptoBot.Model.csproj">
-      <Project>{ce8c3ed6-36ee-44f9-8ec6-1ef369981467}</Project>
-      <Name>CryptoBot.Model</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
 </Project>

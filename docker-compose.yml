@@ -1,0 +1,117 @@
+version: '3.8'
+
+services:
+  # SQL Server Express Database
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: cryptobot-db
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=CryptoBot@2024!
+      - MSSQL_PID=Express
+      - MSSQL_MEMORY_LIMIT_MB=2048
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    networks:
+      - cryptobot-network
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "CryptoBot@2024!", "-Q", "SELECT 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Redis Cache (optional - for session/cache management)
+  redis:
+    image: redis:7-alpine
+    container_name: cryptobot-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - cryptobot-network
+    command: redis-server --appendonly yes
+
+  # CryptoBot Application
+  cryptobot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cryptobot-app
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=CryptoBot;User Id=sa;Password=CryptoBot@2024!;
+      - Redis__ConnectionString=redis:6379
+      - GDAX__ApiKey=${GDAX_API_KEY}
+      - GDAX__ApiSecret=${GDAX_API_SECRET}
+      - GDAX__Passphrase=${GDAX_PASSPHRASE}
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - cryptobot-network
+    volumes:
+      - ./logs:/app/logs
+      - ./config:/app/config
+
+  # Development API (for debugging)
+  cryptobot-api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: api-dev
+    container_name: cryptobot-api-dev
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000;https://+:5001
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=CryptoBot;User Id=sa;Password=CryptoBot@2024!;
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - cryptobot-network
+    volumes:
+      - ./CryptoBot.Api:/app
+      - ./CryptoBot.Model:/src/CryptoBot.Model
+      - ./CryptoBot.Core:/src/CryptoBot.Core
+      - ./CryptoBot.ExchangeEngine:/src/CryptoBot.ExchangeEngine
+    profiles:
+      - dev
+
+  # Angular UI Development
+  cryptobot-ui-dev:
+    build:
+      context: ./CryptoBot.UI
+      dockerfile: Dockerfile.dev
+    container_name: cryptobot-ui-dev
+    ports:
+      - "3003:3003"
+      - "49153:49153"  # Webpack hot reload
+    environment:
+      - NODE_ENV=development
+    networks:
+      - cryptobot-network
+    volumes:
+      - ./CryptoBot.UI:/app
+      - /app/node_modules
+    profiles:
+      - dev
+    command: npm run start
+
+networks:
+  cryptobot-network:
+    driver: bridge
+
+volumes:
+  sqlserver-data:
+  redis-data:

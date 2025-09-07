@@ -1,0 +1,54 @@
+# Development Dockerfile with hot reload and debugging support
+
+# Stage 1: .NET Core API Development
+FROM mcr.microsoft.com/dotnet/core/sdk:2.1 AS api-dev
+WORKDIR /app
+
+# Install debugging tools
+RUN apt-get update && apt-get install -y \
+    procps \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install .NET Core debugging tools
+RUN curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v latest -l /vsdbg
+
+# Copy API project file and restore
+COPY CryptoBot.Api/*.csproj ./CryptoBot.Api/
+WORKDIR /app/CryptoBot.Api
+RUN dotnet restore
+
+# Copy Model project (API dependency)
+COPY CryptoBot.Model/ /src/CryptoBot.Model/
+
+# Set environment for development
+ENV ASPNETCORE_ENVIRONMENT=Development
+ENV DOTNET_USE_POLLING_FILE_WATCHER=1
+
+# Expose ports for API and debugger
+EXPOSE 5000 5001
+
+# Use dotnet watch for hot reload
+ENTRYPOINT ["dotnet", "watch", "run", "--urls", "http://0.0.0.0:5000;https://0.0.0.0:5001"]
+
+# Stage 2: Angular UI Development
+FROM node:14-alpine AS ui-dev
+WORKDIR /app
+
+# Install Angular CLI globally
+RUN npm install -g @angular/cli@4.3.1
+
+# Copy package files
+COPY CryptoBot.UI/package*.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy UI source (will be overridden by volume mount)
+COPY CryptoBot.UI/ .
+
+# Expose Angular dev server and live reload ports
+EXPOSE 3003 49153
+
+# Start Angular dev server with host binding for Docker
+CMD ["npm", "run", "start", "--", "--host", "0.0.0.0", "--port", "3003", "--poll", "2000"]

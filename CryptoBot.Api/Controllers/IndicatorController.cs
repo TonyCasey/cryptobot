@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Api.CryptoBot.Models.DTO.Indicator;
 using Api.CryptoBot.Models.Extensions;
 using CryptoBot.Model.Domain;
+using Asp.Versioning;
 
 namespace Api.CryptoBot.Controllers
 {
@@ -25,7 +26,7 @@ namespace Api.CryptoBot.Controllers
     public class IndicatorController : BaseController< IndicatorRequestDto, IndicatorResponseDto, IndicatorSearchRequestDto, IndicatorSearchResponseDto >
     {
 
-        private readonly IMapper _mapper;
+        private new readonly IMapper _mapper;
         private readonly CryptoBotApiDbContext _dbContext;
 
         /// <summary>
@@ -52,9 +53,9 @@ namespace Api.CryptoBot.Controllers
         /// <response code="200">Indicator found - body contains data</response>
         /// <response code="404">Indicator does not exist</response>
         [Microsoft.AspNetCore.Mvc.HttpGet("{indicatorId}")]
-        public override async Task<IndicatorResponseDto> Get(long indicatorId)
+        public override Task<IndicatorResponseDto> Get(long indicatorId)
         {
-            return _mapper.Map(_dbContext.Indicators.FirstOrDefault(x => x.IndicatorId == indicatorId ), new IndicatorResponseDto()) ;
+            return Task.FromResult(_mapper.Map(_dbContext.Indicators.FirstOrDefault(x => x.IndicatorId == indicatorId ), new IndicatorResponseDto())) ;
         }
 
         // POST: api/Indicator
@@ -69,12 +70,12 @@ namespace Api.CryptoBot.Controllers
         [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(Uri))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(void))]
         [Microsoft.AspNetCore.Mvc.HttpPost]
-        public override async Task<CreatedResult> Post([Microsoft.AspNetCore.Mvc.FromBody]IndicatorRequestDto requestDto)
+        public override Task<CreatedResult> Post([Microsoft.AspNetCore.Mvc.FromBody]IndicatorRequestDto requestDto)
         {
 
             var id =1; // create record
 
-            return Created($"/api/Indicator/{id}", id );
+            return Task.FromResult(Created($"/api/Indicator/{id}", id ));
 
         }
 
@@ -94,9 +95,9 @@ namespace Api.CryptoBot.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent, Type = typeof(string))]
         [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(string))]
         [Microsoft.AspNetCore.Mvc.HttpPut("{indicatorId}")]
-        public override async Task<IndicatorResponseDto> Put(long indicatorId, [Microsoft.AspNetCore.Mvc.FromBody]IndicatorRequestDto requestDto)
+        public override Task<IndicatorResponseDto> Put(long indicatorId, [Microsoft.AspNetCore.Mvc.FromBody]IndicatorRequestDto requestDto)
         {
-            return null;
+            return Task.FromResult<IndicatorResponseDto>(null);
 
         }
 
@@ -114,14 +115,14 @@ namespace Api.CryptoBot.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent, Type = typeof(void))]
         [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(string))]
         [HttpDelete]
-        public async Task<bool> Delete(int indicatorId)
+        public Task<bool> Delete(int indicatorId)
         {
-            return true;
+            return Task.FromResult(true);
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet]
         [Microsoft.AspNetCore.Mvc.Route("Search")]
-        public override async Task<IndicatorSearchResponseDto> Search(IndicatorSearchRequestDto searchRequest)
+        public override Task<IndicatorSearchResponseDto> Search(IndicatorSearchRequestDto searchRequest)
         {
             IndicatorSearchResponseDto response = new IndicatorSearchResponseDto
             {
@@ -131,7 +132,7 @@ namespace Api.CryptoBot.Controllers
                     .FilterByType(searchRequest.IndicatorType)
                     , new List<IndicatorResponseDto>())
             };
-            return response;
+            return Task.FromResult(response);
         }
 
 

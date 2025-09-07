@@ -3,7 +3,6 @@ using CryptoBot.Model.Exchanges;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NLog;
-using RestSharp.Extensions.MonoHttp;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -23,7 +22,7 @@ namespace CryptoBot.ExchangeEngine.API.Exchanges
     public class ExchangeGdaxAPI : ExchangeAPI
     {
         private readonly ExchangeSettings _exchangeSettings;
-        public override string BaseUrl { get; set; } = "https://api.gdax.com";
+        public override string BaseUrl { get; set; } = "https://api.exchange.coinbase.com";
         public override string Name => ExchangeName.GDAX;
         public Logger Logger { get; set; }
 
@@ -244,10 +243,10 @@ namespace CryptoBot.ExchangeEngine.API.Exchanges
                 if (sinceDateTime != null)
                 {
                     url += "&start=" +
-                           HttpUtility.UrlEncode(sinceDateTime.Value.ToString("s",
+                           WebUtility.UrlEncode(sinceDateTime.Value.ToString("s",
                                System.Globalization.CultureInfo.InvariantCulture));
                     url += "&end=" +
-                           HttpUtility.UrlEncode(sinceDateTime.Value.AddMinutes(5.0)
+                           WebUtility.UrlEncode(sinceDateTime.Value.AddMinutes(5.0)
                                .ToString("s", System.Globalization.CultureInfo.InvariantCulture));
                 }
                 tradeChunk = MakeJsonRequest<decimal[][]>(url);
@@ -355,10 +354,10 @@ namespace CryptoBot.ExchangeEngine.API.Exchanges
             sb.Append(symbol);
             sb.Append("/candles?granularity=" + periodSeconds);
             sb.Append("&start=" +
-                      HttpUtility.UrlEncode(startDate.Value.ToString("s",
+                      WebUtility.UrlEncode(startDate.Value.ToString("s",
                           System.Globalization.CultureInfo.InvariantCulture)).ToUpper());
             sb.Append("&end=" +
-                      HttpUtility.UrlEncode(endDate.Value.ToString("s",
+                      WebUtility.UrlEncode(endDate.Value.ToString("s",
                           System.Globalization.CultureInfo.InvariantCulture)).ToUpper());
 
             // nightmare here with GDAX, they ignore the date in the url and return 350+ records
@@ -388,9 +387,9 @@ namespace CryptoBot.ExchangeEngine.API.Exchanges
                 // re-sort in ascending order
                 candles.Sort((c1, c2) => c1.Timestamp.CompareTo(c2.Timestamp));
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                throw e;
+                throw;
             }
 
             
@@ -491,7 +490,7 @@ namespace CryptoBot.ExchangeEngine.API.Exchanges
         {
 
             ClientWebSocket socket = new ClientWebSocket();
-            Task task = socket.ConnectAsync(new Uri("wss://ws-feed.gdax.com"), CancellationToken.None);
+            Task task = socket.ConnectAsync(new Uri("wss://ws-feed.exchange.coinbase.com"), CancellationToken.None);
             task.Wait();
             Thread readThread = new Thread(
                 delegate (object obj)

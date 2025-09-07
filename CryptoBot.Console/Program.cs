@@ -14,12 +14,13 @@ using CryptoBot.Model.Exchanges;
 using NLog;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
 using CryptoBot.Database;
+using Microsoft.Extensions.Configuration;
 using User = CryptoBot.Model.Domain.Account.User;
 
 namespace CryptoBot
@@ -40,6 +41,7 @@ namespace CryptoBot
         #region Nested classes to support running as service
         public const string ServiceName = "MyService";
 
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
         public class Service : ServiceBase
         {
             public Service()
@@ -59,10 +61,19 @@ namespace CryptoBot
         }
         #endregion
 
-        private static async void Start(string[] args)
+        private static void Start(string[] args)
         {
+            // Load configuration
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+
+            // Setup Entity Framework Core options
+            var optionsBuilder = new DbContextOptionsBuilder<CryptoBotDbContext>();
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DBConnectionString"));
+
             // onstart code here
-            _dbContext = new CryptoBotDbContext();
+            _dbContext = new CryptoBotDbContext(optionsBuilder.Options);
             _logger = LogManager.GetCurrentClassLogger();
             _messageDispatcher = new MessageDispatcher();
             _indicatorFactoryWrapper = new IndicatorFactoryWrapper();
@@ -74,9 +85,10 @@ namespace CryptoBot
             // get user 
             User user = _dbContext
                 .Users
-                .Include(x => x.ApiSettings.Select(y => y.Exchange))
+                .Include(x => x.ApiSettings)
+                    .ThenInclude(y => y.Exchange)
                 .Include(x => x.MessagingApps)
-                .Include(x => x.MessagingApps.Select(y => y.MessagingAppSettings))
+                    .ThenInclude(y => y.MessagingAppSettings)
                 .Single(x => x.UserId == 1);
 
             // get watches, get coins, get exchange
@@ -84,18 +96,18 @@ namespace CryptoBot
             List<Bot> bots =
                 _dbContext
                 .Bots
-                .Include("User")
-                .Include("User.ApiSettings")
-                .Include("User.ApiSettings.Exchange")
-                .Include("User.MessagingApps")
-                .Include("User.MessagingApps.MessagingAppSettings")
-                .Include("Exchange")
-                .Include("Coin")
-                .Include("BaseCoin")
-                .Include("Positions")
-                .Include("Indicators")
-                .Include("Indicators.RuleSets")
-                .Include("Indicators.RuleSets.Rules")
+                .Include(x => x.User)
+                .Include(x => x.User.ApiSettings)
+                    .ThenInclude(y => y.Exchange)
+                .Include(x => x.User.MessagingApps)
+                    .ThenInclude(y => y.MessagingAppSettings)
+                .Include(x => x.Exchange)
+                .Include(x => x.Coin)
+                .Include(x => x.BaseCoin)
+                .Include(x => x.Positions)
+                .Include(x => x.Indicators)
+                    .ThenInclude(y => y.RuleSets)
+                    .ThenInclude(z => z.Rules)
                 .AsNoTracking()
                 .Where(x => x.User.UserId == user.UserId)
                 .Where(x => x.Active)
@@ -184,6 +196,7 @@ namespace CryptoBot
             // onstop code here
         }
 
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
         public static void Main(string[] args)
         {
             if (!Environment.UserInteractive)

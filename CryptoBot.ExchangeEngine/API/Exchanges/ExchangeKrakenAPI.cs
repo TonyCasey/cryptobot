@@ -103,7 +103,7 @@ namespace CryptoBot.ExchangeEngine.API.Exchanges
                 string form = GetFormForPayload(payload);
                 // nonce must be first on Kraken
                 form = "nonce=" + nonce + (string.IsNullOrWhiteSpace(form) ? string.Empty : "&" + form);
-                using (SHA256 sha256 = SHA256Managed.Create())
+                using (SHA256 sha256 = SHA256.Create())
                 {
                     string hashString = nonce + form;
                     byte[] sha256Bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(hashString));

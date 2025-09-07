@@ -91,9 +91,10 @@ namespace CryptoBot.ExchangeEngine.API
         /// Load API keys from an encrypted file - keys will stay encrypted in memory
         /// </summary>
         /// <param name="encryptedFile">Encrypted file to load keys from</param>
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
         public virtual void LoadAPIKeys(string encryptedFile)
         {
-            SecureString[] strings = CryptoUtility.LoadProtectedStringsFromFile(encryptedFile);
+            SecureString[] strings = API.Exchanges.CryptoUtility.LoadProtectedStringsFromFile(encryptedFile);
             if (strings.Length < 2)
             {
                 throw new InvalidOperationException("Encrypted keys file should have a public and private key, and an optional pass phrase");
@@ -130,7 +131,9 @@ namespace CryptoBot.ExchangeEngine.API
 
             string fullUrl = $"{(baseUrl ?? BaseUrl)}{url}";
             Uri uri = ProcessRequestUrl(new UriBuilder(fullUrl), payload); // new Uri(fullUrl); // new Uri("https://api.gdax.com/products/BTC-EUR/candles?granularity=3600&start=2018-01-04T06%3A31%3A19&end=2018-01-04T08%3A31%3A19"); //
+#pragma warning disable SYSLIB0014 // HttpWebRequest.CreateHttp is obsolete
             HttpWebRequest request = HttpWebRequest.CreateHttp(uri);
+#pragma warning restore SYSLIB0014
             request.Method = method ?? RequestMethod;
             request.ContentType = RequestContentType;
             request.UserAgent = RequestUserAgent;

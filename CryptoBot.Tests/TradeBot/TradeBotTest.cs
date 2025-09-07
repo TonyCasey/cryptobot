@@ -2,6 +2,8 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
+using CryptoBot.Core.Bots;
+using CryptoBot.Core.Integrations.MessagingApps;
 using CryptoBot.IndicatrorEngine;
 using CryptoBot.IndicatrorEngine.Macd;
 using CryptoBot.Model.Common;
@@ -22,18 +24,19 @@ namespace CryptoBot.Tests.TradeBot
     public class TradeBotTest : BaseTest
     {
         private Bot _bot;
-        private Mock<Core.Bots.TradeBot> _tradeBotMock;
+        private Core.Bots.TradeBot _tradeBot;
+        private Mock<IMessagingApp> _messagingAppMock;
 
 
         [TestInitialize]
         public void Initiatize()
         {
             _bot = GetBot();
+            _messagingAppMock = new Mock<IMessagingApp>();
             
             _dbContext.Setup(x => x.Bots).ReturnsDbSet(new List<Bot>() { _bot });
-            
-            _tradeBotMock = new Mock<Core.Bots.TradeBot>(_bot, _logger, _dbContext.Object, _mapper, _iIndicatorFactoryWrapper);
-            
+            _dbContext.Setup(x => x.Positions).ReturnsDbSet(new List<Position>());
+            _dbContext.Setup(x => x.Orders).ReturnsDbSet(new List<Order>());
         }
         
 
@@ -63,12 +66,10 @@ namespace CryptoBot.Tests.TradeBot
             _iIndicatorFactoryWrapper.Setup(x => x.GetIndicator(It.Is<Enumerations.IndicatorTypeEnum>(y => y == Enumerations.IndicatorTypeEnum.Volume), _logger))
                 .Returns(volumeIndicator.Object);
 
-            _tradeBotMock = new Mock<Core.Bots.TradeBot>(_bot, _logger, _dbContext.Object, _mapper, _iIndicatorFactoryWrapper.Object);
-
-            var tradeBot = _tradeBotMock.Object;
+            _tradeBot = new Core.Bots.TradeBot(_bot, _logger, _dbContext.Object, _mapper, _iIndicatorFactoryWrapper.Object, _messagingAppMock.Object);
 
             // Action
-            bool changePosition = tradeBot.OnCandle(candle);
+            bool changePosition = _tradeBot.OnCandle(candle);
 
             // Assert
             Assert.IsFalse(changePosition);
@@ -98,12 +99,10 @@ namespace CryptoBot.Tests.TradeBot
             _iIndicatorFactoryWrapper.Setup(x => x.GetIndicator(It.Is<Enumerations.IndicatorTypeEnum>(y => y == Enumerations.IndicatorTypeEnum.Volume), _logger))
                 .Returns(volumeIndicator.Object);
 
-            _tradeBotMock = new Mock<Core.Bots.TradeBot>(_bot, _logger, _dbContext.Object, _mapper, _iIndicatorFactoryWrapper.Object);
-
-            var tradeBot = _tradeBotMock.Object;
+            _tradeBot = new Core.Bots.TradeBot(_bot, _logger, _dbContext.Object, _mapper, _iIndicatorFactoryWrapper.Object, _messagingAppMock.Object);
 
             // Action
-            bool changePosition = tradeBot.OnCandle(candle);
+            bool changePosition = _tradeBot.OnCandle(candle);
 
             // Assert
             Assert.IsTrue(changePosition);
@@ -132,12 +131,10 @@ namespace CryptoBot.Tests.TradeBot
             _iIndicatorFactoryWrapper.Setup(x => x.GetIndicator(It.Is<Enumerations.IndicatorTypeEnum>(y => y == Enumerations.IndicatorTypeEnum.Volume), _logger))
                 .Returns(volumeIndicator.Object);
 
-            _tradeBotMock = new Mock<Core.Bots.TradeBot>(_bot, _logger, _dbContext.Object, _mapper, _iIndicatorFactoryWrapper.Object);
-
-            var tradeBot = _tradeBotMock.Object;
+            _tradeBot = new Core.Bots.TradeBot(_bot, _logger, _dbContext.Object, _mapper, _iIndicatorFactoryWrapper.Object, _messagingAppMock.Object);
 
             // Action
-            bool changePosition = tradeBot.OnCandle(candle);
+            bool changePosition = _tradeBot.OnCandle(candle);
 
             // Assert
             Assert.IsFalse(changePosition);
@@ -177,12 +174,10 @@ namespace CryptoBot.Tests.TradeBot
             _iIndicatorFactoryWrapper.Setup(x => x.GetIndicator(It.Is<Enumerations.IndicatorTypeEnum>(y => y == Enumerations.IndicatorTypeEnum.Volume), _logger))
                 .Returns(volumeIndicator.Object);
 
-            _tradeBotMock = new Mock<Core.Bots.TradeBot>(_bot, _logger, _dbContext.Object, _mapper, _iIndicatorFactoryWrapper.Object);
-
-            var tradeBot = _tradeBotMock.Object;
+            _tradeBot = new Core.Bots.TradeBot(_bot, _logger, _dbContext.Object, _mapper, _iIndicatorFactoryWrapper.Object, _messagingAppMock.Object);
 
             // Action
-            bool changePosition = tradeBot.OnCandle(candle);
+            bool changePosition = _tradeBot.OnCandle(candle);
 
             // Assert
             Assert.IsTrue(changePosition);

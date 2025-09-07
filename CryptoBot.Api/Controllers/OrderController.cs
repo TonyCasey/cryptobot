@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Api.CryptoBot.Models.DTO.Order;
 using Api.CryptoBot.Models.Extensions;
 using CryptoBot.Model.Domain;
+using Asp.Versioning;
 
 namespace Api.CryptoBot.Controllers
 {
@@ -24,7 +25,7 @@ namespace Api.CryptoBot.Controllers
     public class OrderController : BaseController< OrderRequestDto, OrderResponseDto, OrderSearchRequestDto, OrderSearchResponseDto >
     {
 
-        private readonly IMapper _mapper;
+        private new readonly IMapper _mapper;
         private readonly CryptoBotApiDbContext _dbContext;
 
         /// <summary>
@@ -51,9 +52,9 @@ namespace Api.CryptoBot.Controllers
         /// <response code="200">Order found - body contains data</response>
         /// <response code="404">Order does not exist</response>
         [Microsoft.AspNetCore.Mvc.HttpGet("{orderId}")]
-        public override async Task<OrderResponseDto> Get(long orderId)
+        public override Task<OrderResponseDto> Get(long orderId)
         {
-            return _mapper.Map(_dbContext.Orders.FirstOrDefault(x=>x.OrderId == orderId), new OrderResponseDto());
+            return Task.FromResult(_mapper.Map(_dbContext.Orders.FirstOrDefault(x=>x.OrderId == orderId), new OrderResponseDto()));
         }
 
         // POST: api/Order
@@ -68,12 +69,12 @@ namespace Api.CryptoBot.Controllers
         [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(Uri))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(void))]
         [Microsoft.AspNetCore.Mvc.HttpPost]
-        public override async Task<CreatedResult> Post([Microsoft.AspNetCore.Mvc.FromBody]OrderRequestDto requestDto)
+        public override Task<CreatedResult> Post([Microsoft.AspNetCore.Mvc.FromBody]OrderRequestDto requestDto)
         {
 
             var id =1; // create record
 
-            return Created($"/api/Order/{id}", id );
+            return Task.FromResult(Created($"/api/Order/{id}", id ));
 
         }
 
@@ -93,9 +94,9 @@ namespace Api.CryptoBot.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent, Type = typeof(string))]
         [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(string))]
         [Microsoft.AspNetCore.Mvc.HttpPut("{orderId}")]
-        public override async Task< OrderResponseDto > Put(long orderId, [Microsoft.AspNetCore.Mvc.FromBody]OrderRequestDto requestDto)
+        public override Task< OrderResponseDto > Put(long orderId, [Microsoft.AspNetCore.Mvc.FromBody]OrderRequestDto requestDto)
         {
-            return null;
+            return Task.FromResult<OrderResponseDto>(null);
 
         }
 
@@ -113,14 +114,14 @@ namespace Api.CryptoBot.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent, Type = typeof(void))]
         [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(string))]
         [HttpDelete]
-        public async Task<bool> Delete(long orderId)
+        public Task<bool> Delete(long orderId)
         {
-            return true;
+            return Task.FromResult(true);
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet]
         [Microsoft.AspNetCore.Mvc.Route("Search")]
-        public override async Task< OrderSearchResponseDto > Search(OrderSearchRequestDto searchRequest)
+        public override Task< OrderSearchResponseDto > Search(OrderSearchRequestDto searchRequest)
         {
             var test = _dbContext
                 .Orders
@@ -140,7 +141,7 @@ namespace Api.CryptoBot.Controllers
                     .ToList()
                     , new List<OrderResponseDto>())
             };
-            return result;
+            return Task.FromResult(result);
         }
 
 

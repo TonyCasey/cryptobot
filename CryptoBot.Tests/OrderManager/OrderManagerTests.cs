@@ -1,4 +1,5 @@
-﻿using CryptoBot.Core.Ordering;
+﻿using CryptoBot.Core.Integrations.MessagingApps;
+using CryptoBot.Core.Ordering;
 using CryptoBot.Core.Trading;
 using CryptoBot.Model.Common;
 using CryptoBot.Model.Domain.Account;
@@ -11,7 +12,7 @@ using Moq;
 using NLog;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -27,7 +28,8 @@ namespace CryptoBot.Tests.Orders
         
         
         private Mock<ITrader> _traderMock;
-        private Mock<OrderManager> _orderManagerMock;
+        private OrderManager _orderManager;
+        private Mock<IMessagingApp> _messagingAppMock;
         private Bot _bot;
          
        
@@ -57,7 +59,8 @@ namespace CryptoBot.Tests.Orders
 
             //var context = new Mock<CryptoBotDbContext>();
 
-            _orderManagerMock = new Mock<OrderManager>(_bot, _traderMock.Object, _dbContext.Object, _logger, _mapper);
+            _messagingAppMock = new Mock<IMessagingApp>();
+            _orderManager = new OrderManager(_bot, _traderMock.Object, _dbContext.Object, _logger, _mapper, _messagingAppMock.Object);
             
         }
 
@@ -69,7 +72,7 @@ namespace CryptoBot.Tests.Orders
                 .Returns(Task.FromResult(SimulateOrderResult(_bot.BaseCoin, _bot.Coin, _bot.Amount, ExchangeAPIOrderResult.Filled)));
 
             // if it throws an exception then the test will fail
-            _orderManagerMock.Object.Buy(new Candle{ ClosePrice = 100, Timestamp = DateTime.Now });
+            _orderManager.Buy(new Candle{ ClosePrice = 100, Timestamp = DateTime.Now });
             
         }
 
@@ -82,7 +85,7 @@ namespace CryptoBot.Tests.Orders
                 .Returns(Task.FromResult(SimulateOrderResult(bot.BaseCoin, bot.Coin, bot.Amount, ExchangeAPIOrderResult.FilledPartially)));
 
             // if it throws an exception then the test will fail
-            _orderManagerMock.Object.Buy(new Candle { ClosePrice = 100, Timestamp = DateTime.Now });
+            _orderManager.Buy(new Candle { ClosePrice = 100, Timestamp = DateTime.Now });
 
         }
 
@@ -181,7 +184,7 @@ namespace CryptoBot.Tests.Orders
         {
             var sellPrice = 10103d;
             var position = new Position { BuyPrice = 10000, Quantity = 0.1, Commission = 1000};
-            var orderManager = _orderManagerMock.Object;
+            var orderManager = _orderManager;
 
             orderManager.SetCurrentPositionGrossProfit(sellPrice, position);
 
@@ -194,7 +197,7 @@ namespace CryptoBot.Tests.Orders
         {
             var sellPrice = 9001;
             var position = new Position { BuyPrice = 10000, Quantity = 0.1, Commission = 1000 };
-            var orderManager = _orderManagerMock.Object;
+            var orderManager = _orderManager;
 
             orderManager.SetCurrentPositionGrossProfit(sellPrice, position);
 
@@ -208,7 +211,7 @@ namespace CryptoBot.Tests.Orders
         {
             var sellPrice = 10103d;
             var position = new Position { BuyPrice = 10000, Quantity = 0.1, Commission = 1000 };
-            var orderManager = _orderManagerMock.Object;
+            var orderManager = _orderManager;
 
             orderManager.SetCurrentPositionNetProfit(sellPrice, position);
 
@@ -221,7 +224,7 @@ namespace CryptoBot.Tests.Orders
         {
             var sellPrice = 10103d;
             var position = new Position { BuyPrice = 10000, Quantity = 0.1, Commission = 1000 };
-            var orderManager = _orderManagerMock.Object;
+            var orderManager = _orderManager;
 
             orderManager.SetCurrentPositionNetProfit(sellPrice, position);
 

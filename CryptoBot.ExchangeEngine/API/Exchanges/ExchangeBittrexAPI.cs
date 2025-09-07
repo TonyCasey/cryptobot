@@ -2,7 +2,6 @@
 
 using CryptoBot.Model.Exchanges;
 using Newtonsoft.Json.Linq;
-using RestSharp.Extensions.MonoHttp;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -106,8 +105,8 @@ namespace CryptoBot.ExchangeEngine.API.Exchanges
             if (CanMakeAuthenticatedRequest(payload))
             {
                 // payload is ignored, except for the nonce which is added to the url query - bittrex puts all the "post" parameters in the url query instead of the request body
-                var query = HttpUtility.ParseQueryString(url.Query);
-                url.Query = "apikey=" + _exchangeSettings.ApiKey + "&nonce=" + payload["nonce"].ToString() + (query.Count == 0 ? string.Empty : "&" + query.ToString());
+                var existingQuery = string.IsNullOrEmpty(url.Query) ? "" : url.Query.TrimStart('?');
+                url.Query = "apikey=" + _exchangeSettings.ApiKey + "&nonce=" + payload["nonce"].ToString() + (string.IsNullOrEmpty(existingQuery) ? string.Empty : "&" + existingQuery);
                 return url.Uri;
             }
             return url.Uri;

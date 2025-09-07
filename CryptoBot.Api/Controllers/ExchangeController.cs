@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Api.CryptoBot.Models.DTO.Exchange;
 using Api.CryptoBot.Models.Extensions;
 using CryptoBot.Model.Domain;
+using Asp.Versioning;
 
 namespace Api.CryptoBot.Controllers
 {
@@ -24,7 +25,7 @@ namespace Api.CryptoBot.Controllers
     public class ExchangeController : BaseController< ExchangeRequestDto, ExchangeResponseDto, ExchangeSearchRequestDto, ExchangeSearchResponseDto >
     {
 
-        private readonly IMapper _mapper;
+        private new readonly IMapper _mapper;
         private readonly CryptoBotApiDbContext _dbContext;
 
         /// <summary>
@@ -51,9 +52,9 @@ namespace Api.CryptoBot.Controllers
         /// <response code="200">Exchange found - body contains data</response>
         /// <response code="404">Exchange does not exist</response>
         [Microsoft.AspNetCore.Mvc.HttpGet("{exchangeId}")]
-        public override async Task<ExchangeResponseDto> Get(long exchangeId)
+        public override Task<ExchangeResponseDto> Get(long exchangeId)
         {
-            return _mapper.Map(_dbContext.Exchanges.FirstOrDefault(x=>x.ExchangeId == exchangeId), new ExchangeResponseDto());
+            return Task.FromResult(_mapper.Map(_dbContext.Exchanges.FirstOrDefault(x=>x.ExchangeId == exchangeId), new ExchangeResponseDto()));
         }
 
         // POST: api/Exchange
@@ -68,12 +69,12 @@ namespace Api.CryptoBot.Controllers
         [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(Uri))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(void))]
         [Microsoft.AspNetCore.Mvc.HttpPost]
-        public override async Task<CreatedResult> Post([Microsoft.AspNetCore.Mvc.FromBody]ExchangeRequestDto requestDto)
+        public override Task<CreatedResult> Post([Microsoft.AspNetCore.Mvc.FromBody]ExchangeRequestDto requestDto)
         {
 
             var id =1; // create record
 
-            return Created($"/api/Exchange/{id}", id );
+            return Task.FromResult(Created($"/api/Exchange/{id}", id ));
 
         }
 
@@ -93,9 +94,9 @@ namespace Api.CryptoBot.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent, Type = typeof(string))]
         [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(string))]
         [Microsoft.AspNetCore.Mvc.HttpPut("{exchangeId}")]
-        public override async Task< ExchangeResponseDto > Put(long exchangeId, [Microsoft.AspNetCore.Mvc.FromBody]ExchangeRequestDto requestDto)
+        public override Task< ExchangeResponseDto > Put(long exchangeId, [Microsoft.AspNetCore.Mvc.FromBody]ExchangeRequestDto requestDto)
         {
-            return null;
+            return Task.FromResult<ExchangeResponseDto>(null);
 
         }
 
@@ -113,14 +114,14 @@ namespace Api.CryptoBot.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent, Type = typeof(void))]
         [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(string))]
         [HttpDelete]
-        public async Task<bool> Delete(int exchangeId)
+        public Task<bool> Delete(int exchangeId)
         {
-            return true;
+            return Task.FromResult(true);
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet]
         [Microsoft.AspNetCore.Mvc.Route("Search")]
-        public override async Task<ExchangeSearchResponseDto> Search(ExchangeSearchRequestDto searchRequest)
+        public override Task<ExchangeSearchResponseDto> Search(ExchangeSearchRequestDto searchRequest)
         {
             ExchangeSearchResponseDto response = new ExchangeSearchResponseDto
             {
@@ -131,7 +132,7 @@ namespace Api.CryptoBot.Controllers
                     new List<ExchangeResponseDto>()
                 )
             };
-            return response;
+            return Task.FromResult(response);
         }
 
 
