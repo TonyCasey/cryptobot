@@ -37,6 +37,14 @@ namespace CryptoBot.Database
         }
 
         /// <summary>
+        /// Parameterless constructor for mocking in unit tests
+        /// </summary>
+        protected CryptoBotDbContext() : base()
+        {
+            
+        }
+
+        /// <summary>
         /// SaveChanges with AddUserAndTimestamp extension
         /// Fills CreationTime, CreationUser, LastUpdateTime, LastUpdateUser fields
         /// </summary>

@@ -1,0 +1,98 @@
+{
+  "name": "CryptoBot Development",
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+    "docker-compose.devcontainer.yml"
+  ],
+  "service": "devcontainer",
+  "workspaceFolder": "/workspace",
+  
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csharp",
+        "ms-dotnettools.vscode-dotnet-runtime",
+        "ms-vscode.mono-debug",
+        "ms-azuretools.vscode-docker",
+        "ms-mssql.mssql",
+        "angular.ng-template",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "streetsidesoftware.code-spell-checker",
+        "formulahendry.auto-rename-tag",
+        "christian-kohler.path-intellisense",
+        "visualstudioexptteam.vscodeintellicode",
+        "redhat.vscode-xml",
+        "dotjoshjohnson.xml"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": true
+        },
+        "files.exclude": {
+          "**/bin": true,
+          "**/obj": true,
+          "**/node_modules": true,
+          "**/.vs": true
+        },
+        "omnisharp.useModernNet": false,
+        "omnisharp.useGlobalMono": "always"
+      }
+    }
+  },
+
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "configureZshAsDefaultShell": true,
+      "installOhMyZsh": true,
+      "upgradePackages": true
+    },
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "latest",
+      "ppa": true
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "14",
+      "nodeGypDependencies": true
+    },
+    "ghcr.io/devcontainers/features/dotnet:2": {
+      "version": "2.1",
+      "runtimeOnly": false
+    },
+    "ghcr.io/devcontainers-contrib/features/mono-aspdotnet:1": {
+      "version": "latest"
+    }
+  },
+
+  "forwardPorts": [
+    80,      // Main app
+    443,     // Main app HTTPS
+    3003,    // Angular UI dev
+    5000,    // API dev HTTP
+    5001,    // API dev HTTPS
+    1433,    // SQL Server
+    6379,    // Redis
+    49153    // Webpack hot reload
+  ],
+
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  
+  "postStartCommand": "bash .devcontainer/post-start.sh",
+
+  "remoteUser": "vscode",
+
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+    "source=${localWorkspaceFolder}/.devcontainer/bash_history,target=/commandhistory,type=bind,consistency=cached"
+  ],
+
+  "runArgs": [
+    "--cap-add=SYS_PTRACE",
+    "--security-opt",
+    "seccomp=unconfined",
+    "--network=host"
+  ]
+}

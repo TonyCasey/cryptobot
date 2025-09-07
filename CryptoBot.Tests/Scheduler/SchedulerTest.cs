@@ -75,9 +75,16 @@ namespace CryptoBot.Tests.Scheduler
                 _scheduler.GetTimeSpanToSleepFor(
                     Enumerations.SchedulerType.ScheduledEventOccursEveryValueInSecondsPastTheHour, 60);
 
-            Assert.IsTrue(TimeSpan.FromSeconds(3600).Subtract(result1) < TimeSpan.FromSeconds(1));
-            Assert.IsTrue(result2 - TimeSpan.FromDays(1) < TimeSpan.FromHours(23));
-            Assert.IsTrue(result3 - TimeSpan.FromHours(1) < TimeSpan.FromHours(1));
+            // For ScheduledEventOccursEveryValueInSeconds, should return exactly the value
+            Assert.AreEqual(TimeSpan.FromSeconds(3600), result1);
+            
+            // For ScheduledEventOccursOnceDailyValueInSecondsPastMidnight, should be less than 24 hours
+            Assert.IsTrue(result2 <= TimeSpan.FromDays(1));
+            Assert.IsTrue(result2 > TimeSpan.Zero);
+            
+            // For ScheduledEventOccursEveryValueInSecondsPastTheHour, could be negative if we're past the mark
+            // Just check it's reasonable
+            Assert.IsTrue(Math.Abs(result3.TotalHours) <= 1.5);
         }
     }
 }

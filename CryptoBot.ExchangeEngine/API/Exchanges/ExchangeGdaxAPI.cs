@@ -22,7 +22,7 @@ namespace CryptoBot.ExchangeEngine.API.Exchanges
     public class ExchangeGdaxAPI : ExchangeAPI
     {
         private readonly ExchangeSettings _exchangeSettings;
-        public override string BaseUrl { get; set; } = "https://api.gdax.com";
+        public override string BaseUrl { get; set; } = "https://api.exchange.coinbase.com";
         public override string Name => ExchangeName.GDAX;
         public Logger Logger { get; set; }
 
@@ -490,7 +490,7 @@ namespace CryptoBot.ExchangeEngine.API.Exchanges
         {
 
             ClientWebSocket socket = new ClientWebSocket();
-            Task task = socket.ConnectAsync(new Uri("wss://ws-feed.gdax.com"), CancellationToken.None);
+            Task task = socket.ConnectAsync(new Uri("wss://ws-feed.exchange.coinbase.com"), CancellationToken.None);
             task.Wait();
             Thread readThread = new Thread(
                 delegate (object obj)
